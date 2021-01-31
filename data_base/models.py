@@ -108,7 +108,7 @@ class Calendar(Base, mixin.IdMixin):
 
 class PriceTag(Base, mixin.IdMixin, mixin.NameMixin):
     __tablename__ = "price_tag"
-    price = Column(Integer, nullable=False)
+    price = Column(Integer, nullable=False, unique=True)
     calendar = relationship("Calendar")
 
 class Services(Base, mixin.IdMixin, mixin.NameMixin):
