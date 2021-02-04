@@ -4,7 +4,7 @@ from fastapi import HTTPException
 from schemas import zip_code as zip_code_schema
 
 def read(db: Session, id: int):
-    query = db.query(models.ZipCode).filter(models.ZipCode.zip_code == id)
+    query = db.query(models.ZipCode).filter(models.ZipCode.id == id)
     return query.first()
 
 def create(db: Session, zip_code: zip_code_schema.ZipCodeCreate):

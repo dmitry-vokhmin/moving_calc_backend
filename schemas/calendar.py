@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from datetime import date
+from .price_tag import PriceTagGet
 
 
 class CalendarBase(BaseModel):
@@ -17,3 +18,4 @@ class CalendarCreate(CalendarBase):
 
 class CalendarGet(CalendarBase):
     id: int
+    price_tag: PriceTagGet

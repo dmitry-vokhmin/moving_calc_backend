@@ -8,9 +8,16 @@ from sqlalchemy.orm import Session
 
 router = APIRouter()
 
+
 @router.post("/inventory/", status_code=status.HTTP_201_CREATED)
 def create_inventory(inventory: inventory_schema.InventoryCreate, db: Session = Depends(get_db)):
     inventory_crud.create(db, inventory)
+
+
+@router.get("/inventory/{inventory_id}", response_model=inventory_schema.InventoryGet, status_code=status.HTTP_200_OK)
+def get_inventory(inventory_id: int, db: Session = Depends(get_db)):
+    return inventory_crud.read(db, inventory_id)
+
 
 @router.get("/inventory/", response_model=List[inventory_schema.InventoryGet], status_code=status.HTTP_200_OK)
 def get_all_inventory(db: Session = Depends(get_db)):

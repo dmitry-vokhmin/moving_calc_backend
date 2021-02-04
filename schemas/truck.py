@@ -3,6 +3,7 @@ from pydantic import BaseModel
 
 class TruckBase(BaseModel):
     name: str
+    truck_type_id: int
 
     class Config:
         orm_mode = True
@@ -13,4 +14,3 @@ class TruckCreate(TruckBase):
 
 class TruckGet(TruckBase):
     id: int
-    truck_type_id: int

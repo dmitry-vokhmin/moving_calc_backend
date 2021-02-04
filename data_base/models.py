@@ -103,7 +103,7 @@ class Calendar(Base, mixin.IdMixin):
     start_date = Column(Date, nullable=False, unique=True)
     end_date = Column(Date, nullable=False, unique=True)
     price_tag_id = Column(Integer,  ForeignKey("price_tag.id"), nullable=False)
-    price_tag = relationship("PriceTag")
+    price_tag = relationship("PriceTag", lazy="joined")
 
 
 class PriceTag(Base, mixin.IdMixin, mixin.NameMixin):
@@ -123,14 +123,14 @@ class Address(Base, mixin.IdMixin):
     __tablename__ = "address"
     house_number = Column(String, nullable=False)
     apartment = Column(String, nullable=True)
-    zip_code_id = Column(Integer, ForeignKey("zip_code.zip_code"), nullable=False)
+    zip_code_id = Column(Integer, ForeignKey("zip_code.id"), nullable=False)
     street_id = Column(Integer, ForeignKey("street.id"), nullable=False)
     zip_code = relationship("ZipCode")
     street = relationship("Street")
 
-class ZipCode(Base):
+class ZipCode(Base, mixin.IdMixin):
     __tablename__ = "zip_code"
-    zip_code = Column(Integer, nullable=False, primary_key=True, autoincrement=False)
+    zip_code = Column(String, nullable=False)
     city = Column(String, nullable=False)
     state = Column(String, nullable=False)
     address = relationship("Address")

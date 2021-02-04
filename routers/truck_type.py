@@ -14,7 +14,7 @@ def create_truck_type(truck_type: truck_type_schema.TruckTypeCreate, db: Session
 
 
 @router.get("/truck_type/{truck_type_id}",
-            response_model=List[truck_type_schema.TruckTypeGet],
+            response_model=truck_type_schema.TruckTypeGet,
             status_code=status.HTTP_200_OK)
 def get_truck_type(truck_type_id: int, db: Session = Depends(get_db)):
     return truck_type_crud.read(db, truck_type_id)

@@ -8,13 +8,16 @@ from sqlalchemy.orm import Session
 
 router = APIRouter()
 
+
 @router.post("/zip_code/", status_code=status.HTTP_201_CREATED)
 def create_zip_code(zip_code: zip_code_schema.ZipCodeCreate, db: Session = Depends(get_db)):
     zip_code_crud.create(db, zip_code)
 
-@router.get("/zip_code/{zip_code_id}", response_model=List[zip_code_schema.ZipCodeGet], status_code=status.HTTP_200_OK)
+
+@router.get("/zip_code/{zip_code_id}", response_model=zip_code_schema.ZipCodeGet, status_code=status.HTTP_200_OK)
 def get_zip_code(zip_code_id: int, db: Session = Depends(get_db)):
     return zip_code_crud.read(db, zip_code_id)
+
 
 @router.get("/zip_code/", response_model=List[zip_code_schema.ZipCodeGet], status_code=status.HTTP_200_OK)
 def get_all_zip_code(db: Session = Depends(get_db)):

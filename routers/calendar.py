@@ -9,9 +9,10 @@ from sqlalchemy.orm import Session
 
 router = APIRouter()
 
-@router.post("/calendar/", status_code=status.HTTP_201_CREATED)
+@router.post("/calendar/", response_model=calendar_schema.CalendarGet, status_code=status.HTTP_201_CREATED)
 def create_calendar(calendar: calendar_schema.CalendarCreate, db: Session = Depends(get_db)):
-    calendar_crud.create(db, calendar)
+    return calendar_crud.create(db, calendar)
+
 
 @router.get("/calendar/{calendar_id}", response_model=calendar_schema.CalendarGet, status_code=status.HTTP_200_OK)
 def get_calendar(calendar_id: int, db: Session = Depends(get_db)):
@@ -23,5 +24,4 @@ def get_all_calendar(db: Session = Depends(get_db)):
 
 @router.get("/calendar/", response_model=calendar_schema.CalendarGet, status_code=status.HTTP_200_OK)
 def get_date(date: datetime.date, db: Session = Depends(get_db)):
-    print(1)
     return calendar_crud.read_date(db, date)

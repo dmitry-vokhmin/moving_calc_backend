@@ -2,6 +2,7 @@ from pydantic import BaseModel
 
 
 class ZipCodeBase(BaseModel):
+    zip_code: str
     city: str
     state: str
 
@@ -14,4 +15,4 @@ class ZipCodeCreate(ZipCodeBase):
 
 
 class ZipCodeGet(ZipCodeBase):
-    zip_code: int
+    id: int
