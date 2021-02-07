@@ -1,5 +1,6 @@
 from pydantic import BaseModel
-
+from .zip_code import ZipCodeGet
+from .street import StreetGet
 
 class AddressBase(BaseModel):
     house_number: str
@@ -10,10 +11,11 @@ class AddressBase(BaseModel):
 
 
 class AddressCreate(AddressBase):
-    pass
+    zip_code_id: int
+    street: str
 
 
 class AddressGet(AddressBase):
     id: int
-    zip_code_id: int
-    street_id: int
+    zip_code: ZipCodeGet
+    street: StreetGet

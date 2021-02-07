@@ -2,16 +2,15 @@ from pydantic import BaseModel
 
 
 class InventoryBase(BaseModel):
-
     name: str
-    height: float
-    weight: float
 
     class Config:
         orm_mode = True
 
 
 class InventoryCreate(InventoryBase):
+    height: float
+    weight: float
     width: float
     deep: float
     dimension: float

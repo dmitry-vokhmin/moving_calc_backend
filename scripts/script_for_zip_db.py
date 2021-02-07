@@ -1,3 +1,4 @@
+from pathlib import Path
 import csv
 import requests
 from requests.adapters import HTTPAdapter
@@ -8,7 +9,8 @@ retry = Retry(connect=3, backoff_factor=0.5)
 adapter = HTTPAdapter(max_retries=retry)
 session.mount('http://', adapter)
 
-with open("uszips.csv", encoding='utf-8') as r_file:
+file_path = Path(__file__).parent.joinpath("uszips.csv")
+with file_path.open("r", encoding='utf-8') as r_file:
     file_reader = csv.reader(r_file)
     count = 0
     for row in file_reader:

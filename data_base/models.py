@@ -36,6 +36,7 @@ room_collection_move_size = Table(
     Column("move_size_id", Integer, ForeignKey("move_size.id"))
 )
 
+
 class Inventory(Base, mixin.IdMixin, mixin.NameMixin):
     __tablename__ = "inventory"
     height = Column(Float, nullable=True)
@@ -45,7 +46,6 @@ class Inventory(Base, mixin.IdMixin, mixin.NameMixin):
     dimension = Column(Float, nullable=False)
     unit = Column(Integer, nullable=False)
     room_collections = relationship("RoomCollection", secondary=inventory_room_collection)
-
 
     def __init__(self, name, unit, dimension=None, height=None, width=None, deep=None, weight=None):
         if not dimension:
@@ -59,19 +59,27 @@ class Inventory(Base, mixin.IdMixin, mixin.NameMixin):
         self.width = width
         self.deep = deep
 
+
 class User(Base, mixin.IdMixin):
     __tablename__ = "user"
     firstname = Column(String, nullable=False)
     lastname = Column(String, nullable=False)
-    phone_number = Column(Integer, nullable=False)
     email = Column(Integer, nullable=False)
     orders = relationship("Order")
+    phone_numbers = relationship("PhoneNumber")
+
+class PhoneNumber(Base, mixin.IdMixin):
+    __tablename__ = "phone_number"
+    phone_number = Column(Integer, nullable=False)
+    user_id = Column(Integer, ForeignKey("user.id"))
+    users = relationship("User")
 
 class Order(Base, mixin.IdMixin):
     __tablename__ = "order"
     user_id = Column(Integer, ForeignKey("user.id"))
     users = relationship("User")
     room_collections = relationship("RoomCollection", secondary=room_collection_order)
+
 
 class RoomCollection(Base, mixin.IdMixin, mixin.NameMixin):
     __tablename__ = "room_collection"
@@ -80,14 +88,17 @@ class RoomCollection(Base, mixin.IdMixin, mixin.NameMixin):
     orders = relationship("Order", secondary=room_collection_order)
     move_sizes = relationship("MoveSize", secondary=room_collection_move_size)
 
+
 class MoveSize(Base, mixin.IdMixin, mixin.NameMixin):
     __tablename__ = "move_size"
     room_collections = relationship("RoomCollection", secondary=room_collection_move_size)
+
 
 class Truck(Base, mixin.IdMixin, mixin.NameMixin):
     __tablename__ = "truck"
     truck_type_id = Column(Integer, ForeignKey("truck_type.id"))
     truck_type = relationship("TruckType")
+
 
 class TruckType(Base, mixin.IdMixin):
     __tablename__ = "truck_type"
@@ -98,11 +109,12 @@ class TruckType(Base, mixin.IdMixin):
     length = Column(Float, nullable=False)
     trucks = relationship("Truck")
 
+
 class Calendar(Base, mixin.IdMixin):
     __tablename__ = "calendar"
     start_date = Column(Date, nullable=False, unique=True)
     end_date = Column(Date, nullable=False, unique=True)
-    price_tag_id = Column(Integer,  ForeignKey("price_tag.id"), nullable=False)
+    price_tag_id = Column(Integer, ForeignKey("price_tag.id"), nullable=False)
     price_tag = relationship("PriceTag", lazy="joined")
 
 
@@ -110,6 +122,7 @@ class PriceTag(Base, mixin.IdMixin, mixin.NameMixin):
     __tablename__ = "price_tag"
     price = Column(Integer, nullable=False, unique=True)
     calendar = relationship("Calendar")
+
 
 class Services(Base, mixin.IdMixin, mixin.NameMixin):
     __tablename__ = "services"
@@ -121,12 +134,14 @@ class FloorsCollection(Base, mixin.IdMixin, mixin.NameMixin):
 
 class Address(Base, mixin.IdMixin):
     __tablename__ = "address"
+    __table_args__ = (UniqueConstraint("house_number", "zip_code_id", "street_id", "apartment", name="_address"),)
     house_number = Column(String, nullable=False)
     apartment = Column(String, nullable=True)
     zip_code_id = Column(Integer, ForeignKey("zip_code.id"), nullable=False)
     street_id = Column(Integer, ForeignKey("street.id"), nullable=False)
-    zip_code = relationship("ZipCode")
-    street = relationship("Street")
+    zip_code = relationship("ZipCode", lazy="joined")
+    street = relationship("Street", lazy="joined")
+
 
 class ZipCode(Base, mixin.IdMixin):
     __tablename__ = "zip_code"
@@ -135,9 +150,8 @@ class ZipCode(Base, mixin.IdMixin):
     state = Column(String, nullable=False)
     address = relationship("Address")
 
+
 class Street(Base, mixin.IdMixin):
     __tablename__ = "street"
     street_name = Column(String, nullable=False, unique=True)
     address = relationship("Address")
-
-

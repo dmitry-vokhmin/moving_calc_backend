@@ -5,7 +5,7 @@ class TruckTypeBase(BaseModel):
     price: int
     length: float
     height: float
-    weight: float
+    width: float
 
     class Config:
         orm_mode = True
