@@ -3,9 +3,11 @@ from data_base import models
 from fastapi import HTTPException
 from schemas import street as street_schema
 
+
 def read(db: Session, id: int):
     query = db.query(models.Street).filter(models.Street.id == id)
     return query.first()
+
 
 def create(db: Session, street: street_schema.StreetCreate):
     street_db = models.Street(**street.dict())
@@ -14,6 +16,7 @@ def create(db: Session, street: street_schema.StreetCreate):
         db.commit()
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e.orig))
+
 
 def get_or_create(db: Session, street_name: str):
     street_db = models.Street(street_name=street_name)
@@ -24,6 +27,7 @@ def get_or_create(db: Session, street_name: str):
         db.rollback()
         street_db = db.query(models.Street).filter(models.Street.street_name == street_name).first()
     return street_db
+
 
 def read_all(db: Session):
     query = db.query(models.Street)

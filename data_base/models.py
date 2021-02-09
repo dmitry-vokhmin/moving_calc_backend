@@ -65,8 +65,8 @@ class User(Base, mixin.IdMixin):
     __table_args__ = (UniqueConstraint("firstname", "email", "phone_number", name="_user"),)
     firstname = Column(String, nullable=False)
     lastname = Column(String, nullable=False)
-    email = Column(Integer, nullable=False)
-    phone_number = Column(Integer, nullable=False)
+    email = Column(String, nullable=False)
+    phone_number = Column(String, nullable=False)
     orders = relationship("Order")
 
 

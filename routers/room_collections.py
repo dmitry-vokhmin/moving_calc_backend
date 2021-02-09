@@ -14,8 +14,15 @@ def create_room_collection(room_collection: room_collection_schema.RoomCollectio
     room_collection_crud.create(db, room_collection)
 
 
+@router.get("/room_collection/{room_collection_id}",
+            response_model=room_collection_schema.RoomCollectionsGet,
+            status_code=status.HTTP_200_OK)
+def get_room_collection(room_collection_id: int, db: Session = Depends(get_db)):
+    return room_collection_crud.read(db, room_collection_id)
+
+
 @router.get("/room_collection/",
-            response_model=List[room_collection_schema.RoomCollectionsCreate],
+            response_model=List[room_collection_schema.RoomCollectionsGet],
             status_code=status.HTTP_200_OK)
 def get_all_room_collections(db: Session = Depends(get_db)):
     return room_collection_crud.read_all(db)

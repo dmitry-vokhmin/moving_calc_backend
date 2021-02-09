@@ -7,6 +7,7 @@ class MoveSizeBase(BaseModel):
     class Config:
         orm_mode = True
 
+
 class MoveSizeCreate(MoveSizeBase):
     pass
 

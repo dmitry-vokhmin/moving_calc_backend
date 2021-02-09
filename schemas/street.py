@@ -2,7 +2,6 @@ from pydantic import BaseModel
 
 
 class StreetBase(BaseModel):
-
     street_name: str
 
     class Config:

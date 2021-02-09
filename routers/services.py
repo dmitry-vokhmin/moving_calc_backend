@@ -8,9 +8,15 @@ from sqlalchemy.orm import Session
 
 router = APIRouter()
 
+
 @router.post("/services/", status_code=status.HTTP_201_CREATED)
 def create_services(services: services_schema.ServicesCreate, db: Session = Depends(get_db)):
     services_crud.create(db, services)
+
+
+@router.get("/services/{services_id}", response_model=services_schema.ServicesGet, status_code=status.HTTP_200_OK)
+def get_services(services_id: int, db: Session = Depends(get_db)):
+    return services_crud.read(db, services_id)
 
 
 @router.get("/services/", response_model=List[services_schema.ServicesGet], status_code=status.HTTP_200_OK)

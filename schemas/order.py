@@ -15,4 +15,3 @@ class OrderCreate(OrderBase):
 
 class OrderGet(OrderBase):
     id: int
-    client_id: int

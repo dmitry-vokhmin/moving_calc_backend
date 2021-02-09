@@ -7,6 +7,7 @@ class RoomCollectionsBase(BaseModel):
     class Config:
         orm_mode = True
 
+
 class RoomCollectionsCreate(RoomCollectionsBase):
     pass
 

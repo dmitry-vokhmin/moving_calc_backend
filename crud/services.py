@@ -4,6 +4,11 @@ from fastapi import HTTPException
 from schemas import services as services_schema
 
 
+def read(db: Session, id: int):
+    query = db.query(models.Services).filter(models.Services.id == id)
+    return query.first()
+
+
 def create(db: Session, services: services_schema.ServicesCreate):
     services_db = models.Services(**services.dict())
     db.add(services_db)
@@ -11,6 +16,7 @@ def create(db: Session, services: services_schema.ServicesCreate):
         db.commit()
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e.orig))
+
 
 def read_all(db: Session):
     query = db.query(models.Services)

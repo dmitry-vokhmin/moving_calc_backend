@@ -15,6 +15,13 @@ def create_floor_collection(floor_collection: floor_collection_schema.FloorColle
     floor_collection_crud.create(db, floor_collection)
 
 
+@router.get("/floor_collection/{floor_collection_id}",
+            response_model=floor_collection_schema.FloorCollectionGet,
+            status_code=status.HTTP_200_OK)
+def get_floor_collection(floor_collection_id: int, db: Session = Depends(get_db)):
+    return floor_collection_crud.read(db, floor_collection_id)
+
+
 @router.get("/floor_collection/",
             response_model=List[floor_collection_schema.FloorCollectionGet],
             status_code=status.HTTP_200_OK)
