@@ -62,17 +62,13 @@ class Inventory(Base, mixin.IdMixin, mixin.NameMixin):
 
 class User(Base, mixin.IdMixin):
     __tablename__ = "user"
+    __table_args__ = (UniqueConstraint("firstname", "email", "phone_number", name="_user"),)
     firstname = Column(String, nullable=False)
     lastname = Column(String, nullable=False)
     email = Column(Integer, nullable=False)
-    orders = relationship("Order")
-    phone_numbers = relationship("PhoneNumber")
-
-class PhoneNumber(Base, mixin.IdMixin):
-    __tablename__ = "phone_number"
     phone_number = Column(Integer, nullable=False)
-    user_id = Column(Integer, ForeignKey("user.id"))
-    users = relationship("User")
+    orders = relationship("Order")
+
 
 class Order(Base, mixin.IdMixin):
     __tablename__ = "order"

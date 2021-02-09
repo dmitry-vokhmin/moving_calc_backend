@@ -13,7 +13,6 @@ from routers import street
 from routers import zip_code
 from routers import truck
 from routers import truck_type
-from routers import phone_number
 
 app = FastAPI(title="some_service", description="", version="0.0.1")
 app.include_router(inventory.router)
@@ -30,7 +29,6 @@ app.include_router(street.router)
 app.include_router(zip_code.router)
 app.include_router(truck.router)
 app.include_router(truck_type.router)
-app.include_router(phone_number.router)
 
 
 if __name__ == '__main__':

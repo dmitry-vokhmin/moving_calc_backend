@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 router = APIRouter()
 
+
 @router.post("/room_collection/", status_code=status.HTTP_201_CREATED)
 def create_room_collection(room_collection: room_collection_schema.RoomCollectionsCreate,
                            db: Session = Depends(get_db)):
