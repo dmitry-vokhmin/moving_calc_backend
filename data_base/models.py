@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey, Table, UniqueConstraint, Date
+import datetime as dt
+from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey, Table, UniqueConstraint, Date, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from . import mixin
@@ -34,6 +35,13 @@ room_collection_move_size = Table(
     Base.metadata,
     Column("room_collection_id", Integer, ForeignKey("room_collection.id")),
     Column("move_size_id", Integer, ForeignKey("move_size.id"))
+)
+
+floor_collection_order = Table(
+    "floor_collection_order",
+    Base.metadata,
+    Column("floor_collection_id", Integer, ForeignKey("floor_collection.id")),
+    Column("order_id", Integer, ForeignKey("order.id"))
 )
 
 
@@ -72,9 +80,25 @@ class User(Base, mixin.IdMixin):
 
 class Order(Base, mixin.IdMixin):
     __tablename__ = "order"
-    user_id = Column(Integer, ForeignKey("user.id"))
+    move_date = Column(Date, nullable=False)
+    hourly_rate = Column(Integer, nullable=False)
+    estimated_cost = Column(Float, nullable=False)  # Интервальное значение пример 1000-1200
+    create_date = Column(DateTime, default=dt.datetime.now, nullable=False)
+    # TODO: Часы выполнения работ, интервальное значение
+    # TODO: Travel Time
+    user_id = Column(Integer, ForeignKey("user.id"), lazy="joined")
     users = relationship("User")
+    address_id = Column(Integer, ForeignKey("address.id"), lazy="joined")
+    address = relationship("Address")
+    move_size_id = Column(Integer, ForeignKey("move_size.id"), lazy="joined")
+    move_size = relationship("MoveSize")
+    service_id = Column(Integer, ForeignKey("service.id"), lazy="joined")
+    service = relationship("Service")
     room_collections = relationship("RoomCollection", secondary=room_collection_order)
+    floor_collection = relationship("FloorCollection", secondary=floor_collection_order)
+
+
+# TODO: Модель таблицы диапозонов времени работ
 
 
 class RoomCollection(Base, mixin.IdMixin, mixin.NameMixin):
@@ -87,6 +111,7 @@ class RoomCollection(Base, mixin.IdMixin, mixin.NameMixin):
 
 class MoveSize(Base, mixin.IdMixin, mixin.NameMixin):
     __tablename__ = "move_size"
+    order = relationship("Order")
     room_collections = relationship("RoomCollection", secondary=room_collection_move_size)
 
 
@@ -122,10 +147,12 @@ class PriceTag(Base, mixin.IdMixin, mixin.NameMixin):
 
 class Services(Base, mixin.IdMixin, mixin.NameMixin):
     __tablename__ = "services"
+    order = relationship("Order")
 
 
 class FloorsCollection(Base, mixin.IdMixin, mixin.NameMixin):
     __tablename__ = "floor_collection"
+    order = relationship("Order", secondary=floor_collection_order)
 
 
 class Address(Base, mixin.IdMixin):
@@ -137,6 +164,7 @@ class Address(Base, mixin.IdMixin):
     street_id = Column(Integer, ForeignKey("street.id"), nullable=False)
     zip_code = relationship("ZipCode", lazy="joined")
     street = relationship("Street", lazy="joined")
+    order = relationship("Order")
 
 
 class ZipCode(Base, mixin.IdMixin):
