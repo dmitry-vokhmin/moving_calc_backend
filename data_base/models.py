@@ -82,20 +82,20 @@ class Order(Base, mixin.IdMixin):
     __tablename__ = "order"
     move_date = Column(Date, nullable=False)
     hourly_rate = Column(Integer, nullable=False)
-    estimated_cost = Column(Float, nullable=False)  # Интервальное значение пример 1000-1200
+    estimated_cost = Column(Float, nullable=False)
+    estimated_hours = Column(Integer, nullable=False)
+    travel_time = Column(Integer, nullable=False)
     create_date = Column(DateTime, default=dt.datetime.now, nullable=False)
-    # TODO: Часы выполнения работ, интервальное значение
-    # TODO: Travel Time
-    user_id = Column(Integer, ForeignKey("user.id"), lazy="joined")
-    users = relationship("User")
-    address_id = Column(Integer, ForeignKey("address.id"), lazy="joined")
-    address = relationship("Address")
-    move_size_id = Column(Integer, ForeignKey("move_size.id"), lazy="joined")
-    move_size = relationship("MoveSize")
-    service_id = Column(Integer, ForeignKey("service.id"), lazy="joined")
-    service = relationship("Service")
+    user_id = Column(Integer, ForeignKey("user.id"))
+    users = relationship("User", lazy="joined")
+    address_id = Column(Integer, ForeignKey("address.id"))
+    address = relationship("Address", lazy="joined")
+    move_size_id = Column(Integer, ForeignKey("move_size.id"))
+    move_size = relationship("MoveSize", lazy="joined")
+    service_id = Column(Integer, ForeignKey("services.id"))
+    service = relationship("Services", lazy="joined")
     room_collections = relationship("RoomCollection", secondary=room_collection_order)
-    floor_collection = relationship("FloorCollection", secondary=floor_collection_order)
+    floor_collection = relationship("FloorsCollection", secondary=floor_collection_order)
 
 
 # TODO: Модель таблицы диапозонов времени работ

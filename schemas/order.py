@@ -10,6 +10,8 @@ class OrderBase(BaseModel):
     move_date: dt.date
     hourly_rate: int
     estimated_cost: float
+    estimated_hours: int
+    travel_time: int
     create_date: dt.datetime
     user: UserGet
     address: AddressGet
