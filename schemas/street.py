@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 
 
 class StreetBase(BaseModel):
@@ -6,6 +6,12 @@ class StreetBase(BaseModel):
 
     class Config:
         orm_mode = True
+
+    @validator("street_name")
+    def empty_str(cls, v):
+        if v == "":
+            raise ValueError("Empty string")
+        return v
 
 
 class StreetCreate(StreetBase):

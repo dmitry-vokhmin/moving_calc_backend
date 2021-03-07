@@ -9,6 +9,11 @@ def read(db: Session, id: int):
     return query.first()
 
 
+def read_move_size(db: Session, move_size: str):
+    query = db.query(models.MoveSize).filter(models.MoveSize.name == move_size)
+    return query.first()
+
+
 def create(db: Session, move_size: move_size_schema.MoveSizeCreate):
     move_size_db = models.MoveSize(name=move_size.name)
     db.add(move_size_db)

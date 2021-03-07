@@ -31,6 +31,12 @@ class UserBase(BaseModel):
         return format_number(n, PhoneNumberFormat.E164)
         # PhoneNumberFormat.NATIONAL if n.country_code == 1 else PhoneNumberFormat.INTERNATIONAL
 
+    @validator("firstname", "lastname")
+    def empty_str(cls, v):
+        if v == "":
+            raise ValueError("Empty string")
+        return v
+
     class Config:
         orm_mode = True
 

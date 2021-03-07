@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from .zip_code import ZipCodeGet
 from .street import StreetGet
 
+
 class AddressBase(BaseModel):
     house_number: str
     apartment: str

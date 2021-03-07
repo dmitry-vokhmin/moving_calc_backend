@@ -1,7 +1,6 @@
 from typing import List
 from fastapi import Depends, APIRouter, status
 from data_base.database import get_db
-from data_base import models
 from schemas import services as services_schema
 from crud import services as services_crud
 from sqlalchemy.orm import Session
@@ -17,6 +16,11 @@ def create_services(services: services_schema.ServicesCreate, db: Session = Depe
 @router.get("/services/{services_id}", response_model=services_schema.ServicesGet, status_code=status.HTTP_200_OK)
 def get_services(services_id: int, db: Session = Depends(get_db)):
     return services_crud.read(db, services_id)
+
+
+@router.get("/services/get/{services}", response_model=services_schema.ServicesGet, status_code=status.HTTP_200_OK)
+def get_services_id(services: str, db: Session = Depends(get_db)):
+    return services_crud.read_service(db, services)
 
 
 @router.get("/services/", response_model=List[services_schema.ServicesGet], status_code=status.HTTP_200_OK)

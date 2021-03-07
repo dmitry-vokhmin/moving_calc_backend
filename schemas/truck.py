@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 
 
 class TruckBase(BaseModel):
@@ -7,6 +7,12 @@ class TruckBase(BaseModel):
 
     class Config:
         orm_mode = True
+
+    @validator("name")
+    def empty_str(cls, v):
+        if v == "":
+            raise ValueError("Empty string")
+        return v
 
 
 class TruckCreate(TruckBase):

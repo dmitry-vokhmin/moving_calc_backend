@@ -9,6 +9,11 @@ def read(db: Session, id: int):
     return query.first()
 
 
+def read_service(db: Session, service: str):
+    query = db.query(models.Services).filter(models.Services.name == service)
+    return query.first()
+
+
 def create(db: Session, services: services_schema.ServicesCreate):
     services_db = models.Services(**services.dict())
     db.add(services_db)

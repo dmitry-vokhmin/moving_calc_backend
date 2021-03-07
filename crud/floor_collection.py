@@ -9,6 +9,11 @@ def read(db: Session, id: int):
     return query.first()
 
 
+def read_floor_collection(db: Session, floor_collection: str):
+    query = db.query(models.FloorsCollection).filter(models.FloorsCollection.name == floor_collection)
+    return query.first()
+
+
 def create(db: Session, floor_collection: floor_collection_schema.FloorCollectionCreate):
     floor_collection_db = models.FloorsCollection(**floor_collection.dict())
     db.add(floor_collection_db)

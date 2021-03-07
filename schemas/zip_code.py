@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 
 
 class ZipCodeBase(BaseModel):
@@ -8,6 +8,12 @@ class ZipCodeBase(BaseModel):
 
     class Config:
         orm_mode = True
+
+    @validator("zip_code", "city", "state")
+    def empty_str(cls, v):
+        if v == "":
+            raise ValueError("Empty string")
+        return v
 
 
 class ZipCodeCreate(ZipCodeBase):

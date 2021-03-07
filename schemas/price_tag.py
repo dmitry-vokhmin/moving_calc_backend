@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 
 
 class PriceTagBase(BaseModel):
@@ -7,6 +7,12 @@ class PriceTagBase(BaseModel):
 
     class Config:
         orm_mode = True
+
+    @validator("name")
+    def empty_str(cls, v):
+        if v == "":
+            raise ValueError("Empty string")
+        return v
 
 
 class PriceTagCreate(PriceTagBase):
