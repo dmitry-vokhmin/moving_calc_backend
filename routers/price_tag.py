@@ -6,7 +6,7 @@ from schemas import price_tag as price_tag_schema
 from crud import price_tag as price_tag_crud
 from sqlalchemy.orm import Session
 
-router = APIRouter()
+router = APIRouter(tags=["Price tag"])
 
 
 @router.post("/price_tag/", status_code=status.HTTP_201_CREATED)

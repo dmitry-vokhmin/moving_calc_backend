@@ -2,7 +2,6 @@ from sqlalchemy.orm import Session
 from data_base import models
 from fastapi import HTTPException
 from schemas import address as address_schema
-from .street import get_or_create
 
 
 def read(db: Session, id: int):
@@ -11,15 +10,12 @@ def read(db: Session, id: int):
 
 
 def create(db: Session, address: address_schema.AddressCreate):
-    address_dict = address.dict()
-    address_dict["street"] = get_or_create(db, address.street)
-    address_db = models.Address(**address_dict)
+    address_db = models.Address(**address.dict())
     db.add(address_db)
     try:
         db.commit()
-    except Exception:
-        db.rollback()
-        address_db = db.query(models.Address).filter_by(**address_dict).first()
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e.orig))
     return address_db
 
 

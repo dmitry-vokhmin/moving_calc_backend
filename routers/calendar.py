@@ -7,7 +7,8 @@ from schemas import calendar as calendar_schema
 from crud import calendar as calendar_crud
 from sqlalchemy.orm import Session
 
-router = APIRouter()
+router = APIRouter(tags=["Calendar"])
+
 
 @router.post("/calendar/", response_model=calendar_schema.CalendarGet, status_code=status.HTTP_201_CREATED)
 def create_calendar(calendar: calendar_schema.CalendarCreate, db: Session = Depends(get_db)):
@@ -18,9 +19,11 @@ def create_calendar(calendar: calendar_schema.CalendarCreate, db: Session = Depe
 def get_calendar(calendar_id: int, db: Session = Depends(get_db)):
     return calendar_crud.read(db, calendar_id)
 
+
 @router.get("/calendar/all/", response_model=List[calendar_schema.CalendarGet], status_code=status.HTTP_200_OK)
 def get_all_calendar(db: Session = Depends(get_db)):
     return calendar_crud.read_all(db)
+
 
 @router.get("/calendar/", response_model=calendar_schema.CalendarGet, status_code=status.HTTP_200_OK)
 def get_date(date: datetime.date, db: Session = Depends(get_db)):

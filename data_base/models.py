@@ -37,13 +37,6 @@ room_collection_move_size = Table(
     Column("move_size_id", Integer, ForeignKey("move_size.id"))
 )
 
-floor_collection_order = Table(
-    "floor_collection_order",
-    Base.metadata,
-    Column("floor_collection_id", Integer, ForeignKey("floor_collection.id")),
-    Column("order_id", Integer, ForeignKey("order.id"))
-)
-
 
 class Inventory(Base, mixin.IdMixin, mixin.NameMixin):
     __tablename__ = "inventory"
@@ -82,20 +75,27 @@ class Order(Base, mixin.IdMixin):
     __tablename__ = "order"
     move_date = Column(Date, nullable=False)
     hourly_rate = Column(Integer, nullable=False)
-    estimated_cost = Column(Float, nullable=False)
-    estimated_hours = Column(Integer, nullable=False)
+    estimated_cost = Column(String, nullable=False)
+    estimated_hours = Column(String, nullable=False)
+    movers = Column(Integer, nullable=False)
+    truck_type = Column(Integer, nullable=False)
     travel_time = Column(Integer, nullable=False)
     create_date = Column(DateTime, default=dt.datetime.now, nullable=False)
-    user_id = Column(Integer, ForeignKey("user.id"))
-    users = relationship("User", lazy="joined")
-    address_id = Column(Integer, ForeignKey("address.id"))
-    address = relationship("Address", lazy="joined")
-    move_size_id = Column(Integer, ForeignKey("move_size.id"))
+    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+    user = relationship("User", lazy="joined")
+    address_from_id = Column(Integer, ForeignKey("address.id"), nullable=False)
+    address_from = relationship("Address", lazy="joined", foreign_keys=[address_from_id])
+    address_to_id = Column(Integer, ForeignKey("address.id"), nullable=False)
+    address_to = relationship("Address", lazy="joined", foreign_keys=[address_to_id])
+    move_size_id = Column(Integer, ForeignKey("move_size.id"), nullable=False)
     move_size = relationship("MoveSize", lazy="joined")
-    service_id = Column(Integer, ForeignKey("services.id"))
-    service = relationship("Services", lazy="joined")
+    service_id = Column(Integer, ForeignKey("service.id"), nullable=False)
+    service = relationship("Service", lazy="joined")
+    floor_collection_from_id = Column(Integer, ForeignKey("floor_collection.id"), nullable=False)
+    floor_collection_from = relationship("FloorsCollection", lazy="joined", foreign_keys=[floor_collection_from_id])
+    floor_collection_to_id = Column(Integer, ForeignKey("floor_collection.id"), nullable=False)
+    floor_collection_to = relationship("FloorsCollection", lazy="joined", foreign_keys=[floor_collection_to_id])
     room_collections = relationship("RoomCollection", secondary=room_collection_order)
-    floor_collection = relationship("FloorsCollection", secondary=floor_collection_order)
 
 
 # TODO: Модель таблицы диапозонов времени работ
@@ -117,7 +117,7 @@ class MoveSize(Base, mixin.IdMixin, mixin.NameMixin):
 
 class Truck(Base, mixin.IdMixin, mixin.NameMixin):
     __tablename__ = "truck"
-    truck_type_id = Column(Integer, ForeignKey("truck_type.id"))
+    truck_type_id = Column(Integer, ForeignKey("truck_type.id"), nullable=False)
     truck_type = relationship("TruckType")
 
 
@@ -145,26 +145,22 @@ class PriceTag(Base, mixin.IdMixin, mixin.NameMixin):
     calendar = relationship("Calendar")
 
 
-class Services(Base, mixin.IdMixin, mixin.NameMixin):
-    __tablename__ = "services"
+class Service(Base, mixin.IdMixin, mixin.NameMixin):
+    __tablename__ = "service"
     order = relationship("Order")
 
 
 class FloorsCollection(Base, mixin.IdMixin, mixin.NameMixin):
     __tablename__ = "floor_collection"
-    order = relationship("Order", secondary=floor_collection_order)
 
 
 class Address(Base, mixin.IdMixin):
     __tablename__ = "address"
-    __table_args__ = (UniqueConstraint("house_number", "zip_code_id", "street_id", "apartment", name="_address"),)
-    house_number = Column(String, nullable=False)
+    __table_args__ = (UniqueConstraint("street", "zip_code_id", name="_address"),)
+    street = Column(String, nullable=False)
     apartment = Column(String, nullable=True)
     zip_code_id = Column(Integer, ForeignKey("zip_code.id"), nullable=False)
-    street_id = Column(Integer, ForeignKey("street.id"), nullable=False)
     zip_code = relationship("ZipCode", lazy="joined")
-    street = relationship("Street", lazy="joined")
-    order = relationship("Order")
 
 
 class ZipCode(Base, mixin.IdMixin):
@@ -172,10 +168,4 @@ class ZipCode(Base, mixin.IdMixin):
     zip_code = Column(String, nullable=False)
     city = Column(String, nullable=False)
     state = Column(String, nullable=False)
-    address = relationship("Address")
-
-
-class Street(Base, mixin.IdMixin):
-    __tablename__ = "street"
-    street_name = Column(String, nullable=False, unique=True)
     address = relationship("Address")

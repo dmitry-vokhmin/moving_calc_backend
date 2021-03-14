@@ -5,7 +5,7 @@ from schemas import user as user_schema
 from crud import user as user_crud
 from sqlalchemy.orm import Session
 
-router = APIRouter()
+router = APIRouter(tags=["User"])
 
 
 @router.post("/user/", response_model=user_schema.UserGet, status_code=status.HTTP_201_CREATED)

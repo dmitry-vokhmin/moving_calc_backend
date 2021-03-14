@@ -5,7 +5,7 @@ from schemas import truck_type as truck_type_schema
 from crud import truck_type as truck_type_crud
 from sqlalchemy.orm import Session
 
-router = APIRouter()
+router = APIRouter(tags=["Truck type"])
 
 
 @router.post("/truck_type/", status_code=status.HTTP_201_CREATED)

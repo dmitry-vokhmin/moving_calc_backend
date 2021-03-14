@@ -5,12 +5,12 @@ from schemas import order as order_schema
 from crud import order as order_crud
 from sqlalchemy.orm import Session
 
-router = APIRouter()
+router = APIRouter(tags=["Order"])
 
 
-@router.post("/order/", status_code=status.HTTP_201_CREATED)
+@router.post("/order/", response_model=order_schema.OrderGet, status_code=status.HTTP_201_CREATED)
 def create_order(order: order_schema.OrderCreate, db: Session = Depends(get_db)):
-    order_crud.create(db, order)
+    return order_crud.create(db, order)
 
 
 @router.get("/order/{order_id}", response_model=order_schema.OrderGet, status_code=status.HTTP_200_OK)

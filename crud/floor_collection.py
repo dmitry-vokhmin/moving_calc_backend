@@ -4,13 +4,11 @@ from fastapi import HTTPException
 from schemas import floor_collection as floor_collection_schema
 
 
-def read(db: Session, id: int):
-    query = db.query(models.FloorsCollection).filter(models.FloorsCollection.id == id)
-    return query.first()
-
-
-def read_floor_collection(db: Session, floor_collection: str):
-    query = db.query(models.FloorsCollection).filter(models.FloorsCollection.name == floor_collection)
+def read(db: Session, id: int, floor_collection: str):
+    if floor_collection:
+        query = db.query(models.FloorsCollection).filter(models.FloorsCollection.name == floor_collection)
+    else:
+        query = db.query(models.FloorsCollection).filter(models.FloorsCollection.id == id)
     return query.first()
 
 

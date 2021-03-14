@@ -16,6 +16,7 @@ def create(db: Session, order: order_schema.OrderCreate):
         db.commit()
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e.orig))
+    return order_db
 
 
 def read_all(db: Session):

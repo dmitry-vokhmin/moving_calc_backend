@@ -5,7 +5,7 @@ from schemas import room_collection as room_collection_schema
 from crud import room_collection as room_collection_crud
 from sqlalchemy.orm import Session
 
-router = APIRouter()
+router = APIRouter(tags=["Room collection"])
 
 
 @router.post("/room_collection/", status_code=status.HTTP_201_CREATED)

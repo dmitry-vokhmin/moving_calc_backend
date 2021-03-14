@@ -9,10 +9,10 @@ from routers import calendar
 from routers import floor_collection
 from routers import price_tag
 from routers import services
-from routers import street
 from routers import zip_code
 from routers import truck
 from routers import truck_type
+from calculator import router
 
 app = FastAPI(title="some_service", description="", version="0.0.1")
 app.include_router(inventory.router)
@@ -25,10 +25,10 @@ app.include_router(calendar.router)
 app.include_router(floor_collection.router)
 app.include_router(price_tag.router)
 app.include_router(services.router)
-app.include_router(street.router)
 app.include_router(zip_code.router)
 app.include_router(truck.router)
 app.include_router(truck_type.router)
+app.include_router(router.router)
 
 
 if __name__ == '__main__':

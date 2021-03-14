@@ -4,13 +4,11 @@ from fastapi import HTTPException
 from schemas import move_size as move_size_schema
 
 
-def read(db: Session, id: int):
-    query = db.query(models.MoveSize).filter(models.MoveSize.id == id)
-    return query.first()
-
-
-def read_move_size(db: Session, move_size: str):
-    query = db.query(models.MoveSize).filter(models.MoveSize.name == move_size)
+def read(db: Session, id: int, move_size: str):
+    if move_size:
+        query = db.query(models.MoveSize).filter(models.MoveSize.name == move_size)
+    else:
+        query = db.query(models.MoveSize).filter(models.MoveSize.id == id)
     return query.first()
 
 

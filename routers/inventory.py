@@ -6,7 +6,7 @@ from schemas import inventory as inventory_schema
 from crud import inventory as inventory_crud
 from sqlalchemy.orm import Session
 
-router = APIRouter()
+router = APIRouter(tags=["Inventory"])
 
 
 @router.post("/inventory/", status_code=status.HTTP_201_CREATED)

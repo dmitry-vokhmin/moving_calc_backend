@@ -5,7 +5,7 @@ from schemas import move_size as move_size_schema
 from crud import move_size as move_size_crud
 from sqlalchemy.orm import Session
 
-router = APIRouter()
+router = APIRouter(tags=["Move size"])
 
 
 @router.post("/move_size/", status_code=status.HTTP_201_CREATED)
@@ -14,13 +14,8 @@ def create_move_size(move_size: move_size_schema.MoveSizeCreate, db: Session = D
 
 
 @router.get("/move_size/{move_size_id}", response_model=move_size_schema.MoveSizeGet, status_code=status.HTTP_200_OK)
-def get_move_size(move_size_id: int, db: Session = Depends(get_db)):
-    return move_size_crud.read(db, move_size_id)
-
-
-@router.get("/move_size/get/{move_size}", response_model=move_size_schema.MoveSizeGet, status_code=status.HTTP_200_OK)
-def get_move_size_id(move_size: str, db: Session = Depends(get_db)):
-    return move_size_crud.read_move_size(db, move_size)
+def get_move_size(move_size_id: int, q: str = None, db: Session = Depends(get_db)):
+    return move_size_crud.read(db, move_size_id, q)
 
 
 @router.get("/move_size/", response_model=List[move_size_schema.MoveSizeGet], status_code=status.HTTP_200_OK)

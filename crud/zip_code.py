@@ -4,13 +4,11 @@ from fastapi import HTTPException
 from schemas import zip_code as zip_code_schema
 
 
-def read(db: Session, id: int):
-    query = db.query(models.ZipCode).filter(models.ZipCode.id == id)
-    return query.first()
-
-
-def read_zip_code(db: Session, zip_code: str):
-    query = db.query(models.ZipCode).filter(models.ZipCode.zip_code == zip_code)
+def read(db: Session, id: int, zip_code: str):
+    if zip_code:
+        query = db.query(models.ZipCode).filter(models.ZipCode.zip_code == zip_code)
+    else:
+        query = db.query(models.ZipCode).filter(models.ZipCode.id == id)
     return query.first()
 
 
