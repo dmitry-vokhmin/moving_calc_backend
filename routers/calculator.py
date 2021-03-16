@@ -1,5 +1,5 @@
 from fastapi import APIRouter, status
-from .calculations import calculations
+from calculator.calculations import calculations
 
 router = APIRouter()
 

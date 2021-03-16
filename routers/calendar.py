@@ -20,11 +20,11 @@ def get_calendar(calendar_id: int, db: Session = Depends(get_db)):
     return calendar_crud.read(db, calendar_id)
 
 
-@router.get("/calendar/all/", response_model=List[calendar_schema.CalendarGet], status_code=status.HTTP_200_OK)
+@router.get("/calendar/", response_model=List[calendar_schema.CalendarGet], status_code=status.HTTP_200_OK)
 def get_all_calendar(db: Session = Depends(get_db)):
     return calendar_crud.read_all(db)
 
 
-@router.get("/calendar/", response_model=calendar_schema.CalendarGet, status_code=status.HTTP_200_OK)
-def get_date(date: datetime.date, db: Session = Depends(get_db)):
-    return calendar_crud.read_date(db, date)
+# @router.get("/calendar/", response_model=calendar_schema.CalendarGet, status_code=status.HTTP_200_OK)
+# def get_date(date: datetime.date, db: Session = Depends(get_db)):
+#     return calendar_crud.read_date(db, date)

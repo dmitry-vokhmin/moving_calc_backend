@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routers import inventory
+from routers import inventory, calculator
 from routers import user
 from routers import room_collections
 from routers import order
@@ -12,7 +12,6 @@ from routers import services
 from routers import zip_code
 from routers import truck
 from routers import truck_type
-from calculator import router
 
 app = FastAPI(title="some_service", description="", version="0.0.1")
 app.include_router(inventory.router)
@@ -28,7 +27,7 @@ app.include_router(services.router)
 app.include_router(zip_code.router)
 app.include_router(truck.router)
 app.include_router(truck_type.router)
-app.include_router(router.router)
+app.include_router(calculator.router)
 
 
 if __name__ == '__main__':

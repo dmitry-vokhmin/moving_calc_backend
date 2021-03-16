@@ -4,15 +4,17 @@ from data_base import models
 from fastapi import HTTPException
 from schemas import calendar as calendar_schema
 
+
 def read(db: Session, id: int):
     query = db.query(models.Calendar).filter(models.Calendar.id == id)
     return query.first()
 
+
 def create(db: Session, calendar: calendar_schema.CalendarCreate):
     calendar_count = db.query(models.Calendar).filter(((models.Calendar.start_date <= calendar.start_date) &
-                                                      (models.Calendar.end_date >= calendar.start_date)) |
+                                                       (models.Calendar.end_date >= calendar.start_date)) |
                                                       ((models.Calendar.start_date <= calendar.end_date) &
-                                                      (models.Calendar.end_date >= calendar.end_date)) |
+                                                       (models.Calendar.end_date >= calendar.end_date)) |
                                                       ((models.Calendar.start_date >= calendar.start_date) &
                                                        (models.Calendar.start_date <= calendar.end_date))).count()
     if calendar_count > 0:
@@ -24,6 +26,7 @@ def create(db: Session, calendar: calendar_schema.CalendarCreate):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e.orig))
     return calendar_db
+
 
 def read_date(db: Session, date: datetime.date):
     calendar_db = db.query(models.Calendar).filter(models.Calendar.start_date <= date,
