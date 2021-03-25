@@ -17,23 +17,30 @@ from . import mixin
 
 Base = declarative_base()
 inventory_room_collection = Table(
-    "inventory_collection",
+    "inventory_room_collection",
     Base.metadata,
     Column("inventory_id", Integer, ForeignKey("inventory.id")),
     Column("room_collection_id", Integer, ForeignKey("room_collection.id"))
 )
 
-room_collection_order = Table(
-    "room_collection_order",
+inventory_inventory_collection = Table(
+    "inventory_inventory_collections",
     Base.metadata,
-    Column("room_collection_id", Integer, ForeignKey("room_collection.id")),
+    Column("inventory_id", Integer, ForeignKey("inventory.id")),
+    Column("inventory_collection_id", Integer, ForeignKey("inventory_collection.id"))
+)
+
+inventory_collection_order = Table(
+    "inventory_collection_order",
+    Base.metadata,
+    Column("inventory_collection_id", Integer, ForeignKey("inventory_collection.id")),
     Column("order_id", Integer, ForeignKey("order.id"))
 )
 
-room_collection_move_size = Table(
-    "room_collection_move_size",
+inventory_collection_move_size = Table(
+    "inventory_collection_move_size",
     Base.metadata,
-    Column("room_collection_id", Integer, ForeignKey("room_collection.id")),
+    Column("inventory_collection_id", Integer, ForeignKey("inventory_collection.id")),
     Column("move_size_id", Integer, ForeignKey("move_size.id"))
 )
 
@@ -42,23 +49,24 @@ class Inventory(Base, mixin.IdMixin, mixin.NameMixin):
     __tablename__ = "inventory"
     height = Column(Float, nullable=True)
     width = Column(Float, nullable=True)
-    deep = Column(Float, nullable=True)
+    length = Column(Float, nullable=True)
     weight = Column(Float, nullable=True)
     dimension = Column(Float, nullable=False)
-    unit = Column(Integer, nullable=False)
+    unit = Column(Integer, nullable=True)
     room_collections = relationship("RoomCollection", secondary=inventory_room_collection)
+    inventory_collections = relationship("InventoryCollection", secondary=inventory_inventory_collection)
 
-    def __init__(self, name, unit, dimension=None, height=None, width=None, deep=None, weight=None):
+    def __init__(self, name, unit=None, dimension=None, height=None, width=None, length=None, weight=None):
         if not dimension:
-            if all((height, width, deep)):
-                dimension = height * width * deep
+            if all((height, width, length)):
+                dimension = height * width * length
         self.dimension = dimension
         self.name = name
         self.unit = unit
         self.height = height
         self.weight = weight
         self.width = width
-        self.deep = deep
+        self.length = length
 
 
 class User(Base, mixin.IdMixin):
@@ -95,7 +103,7 @@ class Order(Base, mixin.IdMixin):
     floor_collection_from = relationship("FloorsCollection", lazy="joined", foreign_keys=[floor_collection_from_id])
     floor_collection_to_id = Column(Integer, ForeignKey("floor_collection.id"), nullable=False)
     floor_collection_to = relationship("FloorsCollection", lazy="joined", foreign_keys=[floor_collection_to_id])
-    room_collections = relationship("RoomCollection", secondary=room_collection_order)
+    inventory_collections = relationship("InventoryCollection", secondary=inventory_collection_order)
 
 
 # TODO: Модель таблицы диапозонов времени работ
@@ -103,16 +111,21 @@ class Order(Base, mixin.IdMixin):
 
 class RoomCollection(Base, mixin.IdMixin, mixin.NameMixin):
     __tablename__ = "room_collection"
-    preset = Column(Boolean, default=False, nullable=False)
     inventories = relationship("Inventory", secondary=inventory_room_collection)
-    orders = relationship("Order", secondary=room_collection_order)
-    move_sizes = relationship("MoveSize", secondary=room_collection_move_size)
+
+
+class InventoryCollection(Base, mixin.IdMixin):
+    __tablename__ = "inventory_collection"
+    preset = Column(Boolean, default=False, nullable=False)
+    inventories = relationship("Inventory", secondary=inventory_inventory_collection)
+    orders = relationship("Order", secondary=inventory_collection_order)
+    move_sizes = relationship("MoveSize", secondary=inventory_collection_move_size)
 
 
 class MoveSize(Base, mixin.IdMixin, mixin.NameMixin):
     __tablename__ = "move_size"
     order = relationship("Order")
-    room_collections = relationship("RoomCollection", secondary=room_collection_move_size)
+    room_collections = relationship("InventoryCollection", secondary=inventory_collection_move_size)
 
 
 class Truck(Base, mixin.IdMixin, mixin.NameMixin):

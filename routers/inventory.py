@@ -19,6 +19,7 @@ def get_inventory(inventory_id: int, db: Session = Depends(get_db)):
     return inventory_crud.read(db, inventory_id)
 
 
-@router.get("/inventory/", response_model=List[inventory_schema.InventoryGet], status_code=status.HTTP_200_OK)
-def get_all_inventory(db: Session = Depends(get_db)):
-    return inventory_crud.read_all(db)
+@router.get("/inventory/all/{room_name}", response_model=List[inventory_schema.InventoryGet],
+            status_code=status.HTTP_200_OK)
+def get_all_inventory(room_name: str, db: Session = Depends(get_db)):
+    return inventory_crud.read_all(db, room_name)

@@ -1,14 +1,15 @@
+from typing import Optional
 from pydantic import BaseModel, validator
 
 
 class InventoryBase(BaseModel):
     name: str
-    height: float
-    weight: float
-    width: float
-    deep: float
+    height: Optional[float]
+    weight: Optional[float]
+    width: Optional[float]
+    length: Optional[float]
     dimension: float
-    unit: int
+    unit: Optional[int]
 
     class Config:
         orm_mode = True

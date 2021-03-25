@@ -20,4 +20,3 @@ class RoomCollectionsCreate(RoomCollectionsBase):
 
 class RoomCollectionsGet(RoomCollectionsBase):
     id: int
-    preset: bool
