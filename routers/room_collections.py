@@ -14,6 +14,11 @@ def create_room_collection(room_collection: room_collection_schema.RoomCollectio
     room_collection_crud.create(db, room_collection)
 
 
+@router.post("/room_collection/{room_id}")
+def create_many_to_many(room_id: int, inventory_list: List[str], db: Session = Depends(get_db)):
+    room_collection_crud.create_many_to_many_inventory(db, room_id, inventory_list)
+
+
 @router.get("/room_collection/{room_collection_id}",
             response_model=room_collection_schema.RoomCollectionsGet,
             status_code=status.HTTP_200_OK)

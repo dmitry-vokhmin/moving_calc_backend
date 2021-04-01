@@ -21,9 +21,10 @@ def create(db: Session, inventory: inventory_schema.InventoryCreate):
 def read_all(db: Session, room_name):
     if room_name == "all":
         query = db.query(models.Inventory)
-    elif room_name == "bedroom":
-        query = db.query(models.Inventory).filter(models.InventoryCollection.move_sizes.any(name=room_name),
-                                                  models.InventoryCollection.preset == True)
+    elif room_name == "1bd":
+        query = db.query(models.Inventory).filter(models.Inventory.inventory_collections.any(
+            id=db.query(models.InventoryCollection.id).filter(models.InventoryCollection.move_size_id == (
+                db.query(models.MoveSize.id).filter(models.MoveSize.name == room_name)))))
     else:
         query = db.query(models.Inventory).filter(models.Inventory.room_collections.any(name=room_name))
     return query.all()

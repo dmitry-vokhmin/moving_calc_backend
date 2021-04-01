@@ -24,6 +24,7 @@ def create(db: Session, calendar: calendar_schema.CalendarCreate):
     try:
         db.commit()
     except Exception as e:
+        db.rollback()
         raise HTTPException(status_code=400, detail=str(e.orig))
     return calendar_db
 

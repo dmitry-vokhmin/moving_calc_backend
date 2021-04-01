@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 
 class InventoryCollectionBase(BaseModel):
-    preset: bool
+    move_size_id: int
 
     class Config:
         orm_mode = True
