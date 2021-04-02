@@ -21,3 +21,21 @@ def create(db: Session, truck: truck_schema.TruckCreate):
 def read_all(db: Session):
     query = db.query(models.Truck)
     return query.all()
+
+
+def delete(db: Session, truck: truck_schema.TruckBase):
+    db.query(models.Truck).filter_by(name=truck.name).delete()
+    try:
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=str(e.orig))
+
+
+def update(db: Session, truck_id: int, truck: truck_schema.TruckCreate):
+    db.query(models.Truck).filter_by(id=truck_id).update({**truck.dict()})
+    try:
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=str(e.orig))

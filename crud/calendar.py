@@ -38,3 +38,18 @@ def read_date(db: Session, date: datetime.date):
 def read_all(db: Session):
     query = db.query(models.Calendar)
     return query.all()
+
+
+def delete(db: Session, calendar: calendar_schema.CalendarBase):
+    db.query(models.Calendar).filter((models.Calendar.start_date == calendar.start_date) &
+                                     (models.Calendar.end_date == calendar.end_date)).delete()
+    try:
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=str(e.orig))
+
+
+def update(db: Session, calendar: calendar_schema.CalendarUpdate):
+    #TODO: Написать логику update
+    pass

@@ -25,6 +25,16 @@ def get_all_calendar(db: Session = Depends(get_db)):
     return calendar_crud.read_all(db)
 
 
+@router.put("/calendar/", status_code=status.HTTP_200_OK)
+def delete_calendar(calendar: calendar_schema.CalendarBase, db: Session = Depends(get_db)):
+    calendar_crud.delete(db, calendar)
+
+
+@router.put("/calendar/update/", status_code=status.HTTP_200_OK)
+def update_calendar(calendar: calendar_schema.CalendarUpdate, db: Session = Depends(get_db)):
+    calendar_crud.update(db, calendar)
+
+
 # @router.get("/calendar/", response_model=calendar_schema.CalendarGet, status_code=status.HTTP_200_OK)
 # def get_date(date: datetime.date, db: Session = Depends(get_db)):
 #     return calendar_crud.read_date(db, date)

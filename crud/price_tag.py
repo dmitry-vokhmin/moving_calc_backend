@@ -21,3 +21,12 @@ def create(db: Session, price_tag: price_tag_schema.PriceTagCreate):
 def read_all(db: Session):
     query = db.query(models.PriceTag)
     return query.all()
+
+
+def update(db: Session, price_tag: price_tag_schema.PriceTagBase):
+    db.query(models.PriceTag).filter_by(name=price_tag.name).update({"price": price_tag.price})
+    try:
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=str(e.orig))

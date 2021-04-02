@@ -1,9 +1,9 @@
 from pydantic import BaseModel, validator
+from .truck_type import TruckTypeGet
 
 
 class TruckBase(BaseModel):
     name: str
-    truck_type_id: int
 
     class Config:
         orm_mode = True
@@ -16,8 +16,9 @@ class TruckBase(BaseModel):
 
 
 class TruckCreate(TruckBase):
-    pass
+    truck_type_id: int
 
 
 class TruckGet(TruckBase):
     id: int
+    truck_type: TruckTypeGet

@@ -100,7 +100,7 @@ class RoomCollection(Base, mixin.IdMixin, mixin.NameMixin):
 class InventoryCollection(Base, mixin.IdMixin):
     __tablename__ = "inventory_collection"
     move_size_id = Column(Integer, ForeignKey("move_size.id"), nullable=False)
-    move_size = relationship("MoveSize")
+    move_size = relationship("MoveSize", lazy="joined")
     inventories = relationship("Inventory", secondary=inventory_inventory_collection)
 
 
@@ -119,10 +119,11 @@ class MoveSize(Base, mixin.IdMixin, mixin.NameMixin):
     inventory_collection = relationship("InventoryCollection")
 
 
-class Truck(Base, mixin.IdMixin, mixin.NameMixin):
+class Truck(Base, mixin.IdMixin):
     __tablename__ = "truck"
+    name = Column(String, nullable=False, unique=True)
     truck_type_id = Column(Integer, ForeignKey("truck_type.id"), nullable=False)
-    truck_type = relationship("TruckType")
+    truck_type = relationship("TruckType", lazy="joined")
 
 
 class TruckType(Base, mixin.IdMixin):
@@ -147,6 +148,12 @@ class PriceTag(Base, mixin.IdMixin, mixin.NameMixin):
     __tablename__ = "price_tag"
     price = Column(Integer, nullable=False, unique=True)
     calendar = relationship("Calendar")
+
+
+class MoverPrice(Base, mixin.IdMixin):
+    __tablename__ = "mover_price"
+    movers = Column(Integer, nullable=False, unique=True)
+    price = Column(Integer, nullable=False, unique=True)
 
 
 class Service(Base, mixin.IdMixin, mixin.NameMixin):

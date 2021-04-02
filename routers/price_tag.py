@@ -24,3 +24,8 @@ def get_price_tag(price_tag_id: int, db: Session = Depends(get_db)):
 @router.get("/price_tag/", response_model=List[price_tag_schema.PriceTagGet], status_code=status.HTTP_200_OK)
 def get_all_price_tags(db: Session = Depends(get_db)):
     return price_tag_crud.read_all(db)
+
+
+@router.put("/price_tag/", status_code=status.HTTP_200_OK)
+def update_price_tag(price_tag: price_tag_schema.PriceTagBase, db: Session = Depends(get_db)):
+    price_tag_crud.update(db, price_tag)

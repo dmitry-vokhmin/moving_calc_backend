@@ -23,11 +23,24 @@ def read_all(db: Session):
     return query.all()
 
 
-def create_many_to_many_inventory(db: Session, room_id, inventory_list):
+def create_many_to_many_inventory(db: Session, room_id: int, inventory_list: list):
     room_collection = db.query(models.RoomCollection).filter_by(id=room_id).first()
     inventory = db.query(models.Inventory).filter(models.Inventory.id.in_(
         db.query(models.Inventory.id).filter(models.Inventory.name.in_(inventory_list)))).all()
     room_collection.inventories.extend(inventory)
+    try:
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=str(e.orig))
+
+
+def delete(db: Session, room_id: int, inventory_list: list):
+    room_collection = db.query(models.RoomCollection).filter_by(id=room_id).first()
+    inventory = db.query(models.Inventory).filter(models.Inventory.id.in_(
+        db.query(models.Inventory.id).filter(models.Inventory.name.in_(inventory_list)))).all()
+    for itm in inventory:
+        room_collection.inventories.remove(itm)
     try:
         db.commit()
     except Exception as e:
