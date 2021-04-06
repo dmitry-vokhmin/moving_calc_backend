@@ -25,6 +25,7 @@ def get_all_mover_prices(db: Session = Depends(get_db)):
     return mover_price_crud.read_all(db)
 
 
-@router.put("/mover_price/", status_code=status.HTTP_200_OK)
-def update_mover_price(mover_price: mover_price_schema.MoverPriceBase, db: Session = Depends(get_db)):
-    mover_price_crud.update(db, mover_price)
+@router.put("/mover_price/{mover_price_id}", status_code=status.HTTP_200_OK)
+def delete_update_mover_price(mover_price_id: int, q: str, mover_price: mover_price_schema.MoverPriceBase,
+                              db: Session = Depends(get_db)):
+    mover_price_crud.delete_update(db, mover_price_id, q, mover_price)

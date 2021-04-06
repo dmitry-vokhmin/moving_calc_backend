@@ -18,7 +18,7 @@ def create(db: Session, zip_code: zip_code_schema.ZipCodeCreate):
     try:
         db.commit()
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e.orig))
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 def read_all(db: Session):

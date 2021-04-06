@@ -1,3 +1,4 @@
+from typing import List
 from sqlalchemy.orm import Session
 from data_base import models
 from fastapi import HTTPException
@@ -15,7 +16,7 @@ def create(db: Session, inventory_collection: inventory_collection_schema.Invent
     try:
         db.commit()
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e.orig))
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 def read_all(db: Session):
@@ -23,26 +24,13 @@ def read_all(db: Session):
     return query.all()
 
 
-def create_many_to_many_inventory(db: Session, move_size_id: int, inventory_list: list):
+def update_many_to_many_inventory(db: Session, move_size_id: int, inventory: List[int]):
     inventory_collection = db.query(models.InventoryCollection).filter_by(move_size_id=move_size_id).first()
-    inventory = db.query(models.Inventory).filter(models.Inventory.id.in_(
-        db.query(models.Inventory.id).filter(models.Inventory.name.in_(inventory_list)))).all()
-    inventory_collection.inventories.extend(inventory)
+    inventory_collection.inventories.clear()
+    inventory_collection.inventories.extend(db.query(models.Inventory).filter(models.Inventory.id.in_(
+        inventory)))
     try:
         db.commit()
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=400, detail=str(e.orig))
-
-
-def delete(db: Session, move_size_id: int, inventory_list: list):
-    inventory_collection = db.query(models.InventoryCollection).filter_by(move_size_id=move_size_id).first()
-    inventory = db.query(models.Inventory).filter(models.Inventory.id.in_(
-        db.query(models.Inventory.id).filter(models.Inventory.name.in_(inventory_list)))).all()
-    for itm in inventory:
-        inventory_collection.inventories.remove(itm)
-    try:
-        db.commit()
-    except Exception as e:
-        db.rollback()
-        raise HTTPException(status_code=400, detail=str(e.orig))
+        raise HTTPException(status_code=400, detail=str(e))

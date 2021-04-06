@@ -15,8 +15,8 @@ def create_room_collection(room_collection: room_collection_schema.RoomCollectio
 
 
 @router.post("/room_collection/{room_id}")
-def create_many_to_many(room_id: int, inventory: List[str], db: Session = Depends(get_db)):
-    room_collection_crud.create_many_to_many_inventory(db, room_id, inventory)
+def update_many_to_many(room_id: int, inventory: List[int], db: Session = Depends(get_db)):
+    room_collection_crud.update_many_to_many_inventory(db, room_id, inventory)
 
 
 @router.get("/room_collection/{room_collection_id}",
@@ -31,8 +31,3 @@ def get_room_collection(room_collection_id: int, db: Session = Depends(get_db)):
             status_code=status.HTTP_200_OK)
 def get_all_room_collections(db: Session = Depends(get_db)):
     return room_collection_crud.read_all(db)
-
-
-@router.put("/room_collection/{room_id}", status_code=status.HTTP_200_OK)
-def delete_room_collection_inventory(room_id: int, inventory: list, db: Session = Depends(get_db)):
-    room_collection_crud.delete(db, room_id, inventory)

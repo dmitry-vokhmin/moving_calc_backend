@@ -14,9 +14,9 @@ def create_inventory_collection(inventory_collection: inventory_collection_schem
     inventory_collection_crud.create(db, inventory_collection)
 
 
-@router.post("/inventory_collection/{move_size_id}")
-def create_many_to_many(room_id: int, inventory_list: List[str], db: Session = Depends(get_db)):
-    inventory_collection_crud.create_many_to_many_inventory(db, room_id, inventory_list)
+@router.post("/inventory_collection/{move_size_id}", status_code=status.HTTP_201_CREATED)
+def update_many_to_many(move_size_id: int, inventory: List[int], db: Session = Depends(get_db)):
+    inventory_collection_crud.update_many_to_many_inventory(db, move_size_id, inventory)
 
 
 @router.get("/inventory_collection/{inventory_collection_id}",
@@ -31,9 +31,3 @@ def get_inventory_collection(inventory_collection_id: int, db: Session = Depends
             status_code=status.HTTP_200_OK)
 def get_all_inventory_collection(db: Session = Depends(get_db)):
     return inventory_collection_crud.read_all(db)
-
-
-@router.put("/inventory_collection/{inventory_collection_id}", status_code=status.HTTP_200_OK)
-def delete_inventory_collection_inventory(inventory_collection_id: int, inventory_list: list,
-                                          db: Session = Depends(get_db)):
-    inventory_collection_crud.delete(db, inventory_collection_id, inventory_list)

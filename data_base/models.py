@@ -122,7 +122,7 @@ class MoveSize(Base, mixin.IdMixin, mixin.NameMixin):
 class Truck(Base, mixin.IdMixin):
     __tablename__ = "truck"
     name = Column(String, nullable=False, unique=True)
-    truck_type_id = Column(Integer, ForeignKey("truck_type.id"), nullable=False)
+    truck_type_id = Column(Integer, ForeignKey("truck_type.id", ondelete="CASCADE"), nullable=False)
     truck_type = relationship("TruckType", lazy="joined")
 
 
@@ -133,7 +133,7 @@ class TruckType(Base, mixin.IdMixin):
     height = Column(Float, nullable=False)
     width = Column(Float, nullable=False)
     length = Column(Float, nullable=False)
-    trucks = relationship("Truck")
+    trucks = relationship("Truck", cascade="all, delete", passive_deletes=True)
 
 
 class Calendar(Base, mixin.IdMixin):

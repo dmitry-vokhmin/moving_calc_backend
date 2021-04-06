@@ -15,7 +15,7 @@ def create(db: Session, mover_price: mover_price_schema.MoverPriceCreate):
     try:
         db.commit()
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e.orig))
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 def read_all(db: Session):
@@ -23,10 +23,13 @@ def read_all(db: Session):
     return query.all()
 
 
-def update(db: Session, mover_price: mover_price_schema.MoverPriceBase):
-    db.query(models.MoverPrice).filter_by(movers=mover_price.movers).update({"price": mover_price.price})
+def delete_update(db: Session, mover_price_id: int, q: str, mover_price: mover_price_schema.MoverPriceBase):
+    if q == "u":
+        db.query(models.MoverPrice).filter_by(id=mover_price_id).update({"price": mover_price.price})
+    elif q == "d":
+        db.query(models.MoverPrice).filter_by(id=mover_price_id).delete()
     try:
         db.commit()
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=400, detail=str(e.orig))
+        raise HTTPException(status_code=400, detail=str(e))

@@ -15,7 +15,7 @@ def create(db: Session, address: address_schema.AddressCreate):
     try:
         db.commit()
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e.orig))
+        raise HTTPException(status_code=400, detail=str(e))
     return address_db
 
 

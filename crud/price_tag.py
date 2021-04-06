@@ -15,7 +15,7 @@ def create(db: Session, price_tag: price_tag_schema.PriceTagCreate):
     try:
         db.commit()
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e.orig))
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 def read_all(db: Session):
@@ -23,10 +23,13 @@ def read_all(db: Session):
     return query.all()
 
 
-def update(db: Session, price_tag: price_tag_schema.PriceTagBase):
-    db.query(models.PriceTag).filter_by(name=price_tag.name).update({"price": price_tag.price})
+def delete_update(db: Session, price_tag_id: int, q: str, price_tag: price_tag_schema.PriceTagBase):
+    if q == "u":
+        db.query(models.PriceTag).filter_by(id=price_tag_id).update({"price": price_tag.price})
+    elif q == "d":
+        db.query(models.PriceTag).filter_by(id=price_tag_id).delete()
     try:
         db.commit()
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=400, detail=str(e.orig))
+        raise HTTPException(status_code=400, detail=str(e))

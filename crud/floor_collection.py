@@ -18,7 +18,7 @@ def create(db: Session, floor_collection: floor_collection_schema.FloorCollectio
     try:
         db.commit()
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e.orig))
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 def read_all(db: Session):

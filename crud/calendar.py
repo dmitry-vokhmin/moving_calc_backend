@@ -1,4 +1,3 @@
-import datetime
 from sqlalchemy.orm import Session
 from data_base import models
 from fastapi import HTTPException
@@ -25,14 +24,8 @@ def create(db: Session, calendar: calendar_schema.CalendarCreate):
         db.commit()
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=400, detail=str(e.orig))
+        raise HTTPException(status_code=400, detail=str(e))
     return calendar_db
-
-
-def read_date(db: Session, date: datetime.date):
-    calendar_db = db.query(models.Calendar).filter(models.Calendar.start_date <= date,
-                                                   models.Calendar.end_date >= date)
-    return calendar_db.first()
 
 
 def read_all(db: Session):
@@ -40,16 +33,23 @@ def read_all(db: Session):
     return query.all()
 
 
-def delete(db: Session, calendar: calendar_schema.CalendarBase):
-    db.query(models.Calendar).filter((models.Calendar.start_date == calendar.start_date) &
-                                     (models.Calendar.end_date == calendar.end_date)).delete()
+def delete_update(db: Session, calendar_id: int, q: str, calendar: calendar_schema.CalendarBase):
+    if q == "d":
+        db.query(models.Calendar).filter_by(id=calendar_id).delete()
+    elif q == "u":
+        calendar_count = db.query(models.Calendar).filter((models.Calendar.id != calendar_id) &
+                                                          (((models.Calendar.start_date <= calendar.start_date) &
+                                                           (models.Calendar.end_date >= calendar.start_date)) |
+                                                          ((models.Calendar.start_date <= calendar.end_date) &
+                                                           (models.Calendar.end_date >= calendar.end_date)) |
+                                                          ((models.Calendar.start_date >= calendar.start_date) &
+                                                           (models.Calendar.start_date <= calendar.end_date)))).count()
+        if calendar_count > 0:
+            raise HTTPException(status_code=400, detail="This dates are occupied")
+        else:
+            db.query(models.Calendar).filter_by(id=calendar_id).update({**calendar.dict()})
     try:
         db.commit()
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=400, detail=str(e.orig))
-
-
-def update(db: Session, calendar: calendar_schema.CalendarUpdate):
-    #TODO: Написать логику update
-    pass
+        raise HTTPException(status_code=400, detail=str(e))
