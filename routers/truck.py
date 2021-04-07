@@ -23,6 +23,11 @@ def get_all_trucks(db: Session = Depends(get_db)):
     return truck_crud.read_all(db)
 
 
-@router.put("/truck/{truck_id}", status_code=status.HTTP_200_OK)
-def delete_update_truck(truck_id: int, q: str, truck: truck_schema.TruckCreate, db: Session = Depends(get_db)):
-    truck_crud.delete_update(db, truck_id, q, truck)
+@router.put("/truck/delete/{truck_id}", status_code=status.HTTP_200_OK)
+def delete_truck(truck_id: int, db: Session = Depends(get_db)):
+    truck_crud.delete(db, truck_id)
+
+
+@router.put("/truck/update/{truck_id}", status_code=status.HTTP_200_OK)
+def update_truck(truck_id: int, truck: truck_schema.TruckCreate, db: Session = Depends(get_db)):
+    truck_crud.update(db, truck_id, truck)

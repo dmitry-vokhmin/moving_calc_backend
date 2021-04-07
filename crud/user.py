@@ -2,25 +2,30 @@ from sqlalchemy.orm import Session
 from data_base import models
 from fastapi import HTTPException
 from schemas import user as user_schema
+from security.security import get_secret_hash
 
 
-def read(db: Session, id: int):
-    query = db.query(models.User).filter(models.User.id == id)
-    return query.first()
-
-
-def get_or_create(db: Session, user: user_schema.UserCreate):
-    # phone_number = db.query(models.PhoneNumber).filter(models.PhoneNumber.phone_number == user.phone_number).first()
-    user_db = models.User(**user.dict())
+def create(db: Session, user: user_schema.UserCreate):
+    user_db = models.User(
+        username=user.username,
+        email=user.email,
+        password=get_secret_hash(user.password.get_secret_value())
+    )
     db.add(user_db)
     try:
         db.commit()
     except Exception:
+        # TODO: выдавать ошибку пользователю при регистрации
         db.rollback()
-        user_db = db.query(models.User).filter_by(**user.dict()).first()
+        raise HTTPException(status_code=400, detail="Invalid user")
     return user_db
 
 
-def read_all(db: Session):
-    query = db.query(models.User)
-    return query.all()
+def read(db: Session, user_id: int):
+    user_db = db.query(models.User).filter_by(id=user_id).first()
+    return user_db
+
+
+def read_by_user_name(db: Session, user: user_schema.UserAuth):
+    user_db = db.query(models.User).filter_by(username=user.username).first()
+    return user_db

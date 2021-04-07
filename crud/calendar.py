@@ -33,21 +33,28 @@ def read_all(db: Session):
     return query.all()
 
 
-def delete_update(db: Session, calendar_id: int, q: str, calendar: calendar_schema.CalendarBase):
-    if q == "d":
-        db.query(models.Calendar).filter_by(id=calendar_id).delete()
-    elif q == "u":
-        calendar_count = db.query(models.Calendar).filter((models.Calendar.id != calendar_id) &
-                                                          (((models.Calendar.start_date <= calendar.start_date) &
-                                                           (models.Calendar.end_date >= calendar.start_date)) |
-                                                          ((models.Calendar.start_date <= calendar.end_date) &
-                                                           (models.Calendar.end_date >= calendar.end_date)) |
-                                                          ((models.Calendar.start_date >= calendar.start_date) &
-                                                           (models.Calendar.start_date <= calendar.end_date)))).count()
-        if calendar_count > 0:
-            raise HTTPException(status_code=400, detail="This dates are occupied")
-        else:
-            db.query(models.Calendar).filter_by(id=calendar_id).update({**calendar.dict()})
+def delete(db: Session, calendar_id: int):
+    db.query(models.Calendar).filter_by(id=calendar_id).delete()
+    try:
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+def update(db: Session, calendar_id: int, calendar: calendar_schema.CalendarBase):
+    calendar_count = db.query(models.Calendar).filter((models.Calendar.id != calendar_id) &
+                                                      (((models.Calendar.start_date <= calendar.start_date) &
+                                                        (models.Calendar.end_date >= calendar.start_date)) |
+                                                       ((models.Calendar.start_date <= calendar.end_date) &
+                                                        (models.Calendar.end_date >= calendar.end_date)) |
+                                                       ((models.Calendar.start_date >= calendar.start_date) &
+                                                        (models.Calendar.start_date <= calendar.end_date)))).count()
+
+    if calendar_count > 0:
+        raise HTTPException(status_code=400, detail="This dates are occupied")
+    else:
+        db.query(models.Calendar).filter_by(id=calendar_id).update({**calendar.dict()})
     try:
         db.commit()
     except Exception as e:

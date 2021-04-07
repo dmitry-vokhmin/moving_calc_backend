@@ -4,6 +4,7 @@ from data_base.database import get_db
 from schemas import truck_type as truck_type_schema
 from crud import truck_type as truck_type_crud
 from sqlalchemy.orm import Session
+from security.security import get_current_user
 
 router = APIRouter(tags=["Truck type"])
 
@@ -21,11 +22,15 @@ def get_truck_type(truck_type_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("/truck_type/", response_model=List[truck_type_schema.TruckTypeGet], status_code=status.HTTP_200_OK)
-def get_all_truck_types(db: Session = Depends(get_db)):
+def get_all_truck_types(user=Depends(get_current_user), db: Session = Depends(get_db)):
     return truck_type_crud.read_all(db)
 
 
-@router.put("/truck_type/{truck_type_id}", status_code=status.HTTP_200_OK)
-def delete_update_truck_type(truck_type_id: int, q: str, truck_type: truck_type_schema.TruckTypeBase,
-                             db: Session = Depends(get_db)):
-    truck_type_crud.delete_update(db, truck_type_id, q, truck_type)
+@router.put("/truck_type/delete/{truck_type_id}", status_code=status.HTTP_200_OK)
+def delete_truck_type(truck_type_id: int, db: Session = Depends(get_db)):
+    truck_type_crud.delete(db, truck_type_id)
+
+
+@router.put("/truck_type/update/{truck_type_id}", status_code=status.HTTP_200_OK)
+def update_truck_type(truck_type_id: int, truck_type: truck_type_schema.TruckTypeBase, db: Session = Depends(get_db)):
+    truck_type_crud.update(db, truck_type_id, truck_type)

@@ -23,11 +23,17 @@ def read_all(db: Session):
     return query.all()
 
 
-def delete_update(db: Session, price_tag_id: int, q: str, price_tag: price_tag_schema.PriceTagBase):
-    if q == "u":
-        db.query(models.PriceTag).filter_by(id=price_tag_id).update({"price": price_tag.price})
-    elif q == "d":
-        db.query(models.PriceTag).filter_by(id=price_tag_id).delete()
+def delete(db: Session, price_tag_id: int):
+    db.query(models.PriceTag).filter_by(id=price_tag_id).delete()
+    try:
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+def update(db: Session, price_tag_id: int, price_tag: price_tag_schema.PriceTagBase):
+    db.query(models.PriceTag).filter_by(id=price_tag_id).update({"price": price_tag.price})
     try:
         db.commit()
     except Exception as e:

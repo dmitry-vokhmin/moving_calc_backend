@@ -55,8 +55,8 @@ class Inventory(Base, mixin.IdMixin, mixin.NameMixin):
         self.length = length
 
 
-class User(Base, mixin.IdMixin):
-    __tablename__ = "user"
+class UserClient(Base, mixin.IdMixin):
+    __tablename__ = "user_client"
     __table_args__ = (UniqueConstraint("firstname", "email", "phone_number", name="_user"),)
     firstname = Column(String, nullable=False)
     lastname = Column(String, nullable=False)
@@ -75,8 +75,8 @@ class Order(Base, mixin.IdMixin):
     truck_type = Column(Integer, nullable=False)
     travel_time = Column(Integer, nullable=False)
     create_date = Column(DateTime, default=dt.datetime.now, nullable=False)
-    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
-    user = relationship("User", lazy="joined")
+    user_id = Column(Integer, ForeignKey("user_client.id"), nullable=False)
+    user = relationship("UserClient", lazy="joined")
     address_from_id = Column(Integer, ForeignKey("address.id"), nullable=False)
     address_from = relationship("Address", lazy="joined", foreign_keys=[address_from_id])
     address_to_id = Column(Integer, ForeignKey("address.id"), nullable=False)
@@ -180,3 +180,11 @@ class ZipCode(Base, mixin.IdMixin):
     city = Column(String, nullable=False)
     state = Column(String, nullable=False)
     address = relationship("Address")
+
+
+class User(Base, mixin.IdMixin):
+    __tablename__ = "user"
+    username = Column(String, nullable=False, unique=True)
+    password = Column(String, nullable=False)
+    email = Column(String, nullable=False, unique=True)
+    is_staff = Column(Boolean, nullable=False, default=False)

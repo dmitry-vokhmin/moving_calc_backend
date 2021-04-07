@@ -23,11 +23,17 @@ def read_all(db: Session):
     return query.all()
 
 
-def delete_update(db: Session, mover_price_id: int, q: str, mover_price: mover_price_schema.MoverPriceBase):
-    if q == "u":
-        db.query(models.MoverPrice).filter_by(id=mover_price_id).update({"price": mover_price.price})
-    elif q == "d":
-        db.query(models.MoverPrice).filter_by(id=mover_price_id).delete()
+def delete(db: Session, mover_price_id: int):
+    db.query(models.MoverPrice).filter_by(id=mover_price_id).delete()
+    try:
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+def update(db: Session, mover_price_id: int, mover_price: mover_price_schema.MoverPriceBase):
+    db.query(models.MoverPrice).filter_by(id=mover_price_id).update({"price": mover_price.price})
     try:
         db.commit()
     except Exception as e:

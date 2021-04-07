@@ -23,11 +23,17 @@ def read_all(db: Session):
     return query.all()
 
 
-def delete_update(db: Session, truck_id: int, q: str, truck: truck_schema.TruckBase):
-    if q == "d":
-        db.query(models.Truck).filter_by(id=truck_id).delete()
-    elif q == "u":
-        db.query(models.Truck).filter_by(id=truck_id).update({**truck.dict()})
+def delete(db: Session, truck_id: int):
+    db.query(models.Truck).filter_by(id=truck_id).delete()
+    try:
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+def update(db: Session, truck_id: int, truck: truck_schema.TruckBase):
+    db.query(models.Truck).filter_by(id=truck_id).update({**truck.dict()})
     try:
         db.commit()
     except Exception as e:

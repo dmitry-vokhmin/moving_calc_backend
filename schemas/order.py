@@ -1,6 +1,6 @@
 import datetime as dt
 from pydantic import BaseModel
-from .user import UserGet
+from .user_client import UserGet
 from .address import AddressGet
 from .floor_collection import FloorCollectionGet
 from .services import ServicesGet
