@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routers import inventory, calculator
+from routers import inventory, calculate
 from routers import user_client
 from routers import room_collections
 from routers import order
@@ -33,7 +33,7 @@ app.include_router(address.router)
 app.include_router(zip_code.router)
 app.include_router(truck.router)
 app.include_router(truck_type.router)
-app.include_router(calculator.router)
+app.include_router(calculate.router)
 
 
 

@@ -1,16 +1,26 @@
 from typing import List
-from fastapi import Depends, APIRouter, status
+from fastapi import Depends, APIRouter, status, HTTPException
 from data_base.database import get_db
 from schemas import move_size as move_size_schema
 from crud import move_size as move_size_crud
 from sqlalchemy.orm import Session
+from security.security import get_current_user
+from data_base.models import User
 
 router = APIRouter(tags=["Move size"])
 
 
 @router.post("/move_size/", status_code=status.HTTP_201_CREATED)
-def create_move_size(move_size: move_size_schema.MoveSizeCreate, db: Session = Depends(get_db)):
-    move_size_crud.create(db, move_size)
+def create_move_size(move_size: move_size_schema.MoveSizeCreate,
+                     db: Session = Depends(get_db),
+                     user: User = Depends(get_current_user)):
+    if user.is_staff:
+        move_size_crud.create(db, move_size)
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
 
 
 @router.get("/move_size/{move_size_id}", response_model=move_size_schema.MoveSizeGet, status_code=status.HTTP_200_OK)

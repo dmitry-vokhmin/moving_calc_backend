@@ -11,7 +11,7 @@ from data_base.models import User
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 SECRET_KEY = "adsfagjhakjdbagcvuiowqiuDFJKJHDASOKJHADFIJEWNVKLAKJLWEFAJP"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+ACCESS_TOKEN_EXPIRE_DAYS = 60
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="authorization")
 
@@ -24,7 +24,7 @@ def verify_secret(plain_password, hash_password):
     return password_context.verify(plain_password, hash_password)
 
 
-def create_access_token(user, expires_delta=dt.timedelta(ACCESS_TOKEN_EXPIRE_MINUTES)):
+def create_access_token(user, expires_delta=dt.timedelta(ACCESS_TOKEN_EXPIRE_DAYS)):
     expire = dt.datetime.utcnow() + expires_delta
     to_encode = {"exp": expire, "id": user.id}
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)

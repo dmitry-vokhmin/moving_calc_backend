@@ -1,17 +1,26 @@
 from typing import List
-from fastapi import Depends, APIRouter, status
+from fastapi import Depends, APIRouter, status, HTTPException
 from data_base.database import get_db
-from data_base import models
 from schemas import price_tag as price_tag_schema
 from crud import price_tag as price_tag_crud
 from sqlalchemy.orm import Session
+from security.security import get_current_user
+from data_base.models import User
 
 router = APIRouter(tags=["Price tag"])
 
 
 @router.post("/price_tag/", status_code=status.HTTP_201_CREATED)
-def create_price_tag(price_tag: price_tag_schema.PriceTagCreate, db: Session = Depends(get_db)):
-    price_tag_crud.create(db, price_tag)
+def create_price_tag(price_tag: price_tag_schema.PriceTagCreate,
+                     db: Session = Depends(get_db),
+                     user: User = Depends(get_current_user)):
+    if user.is_staff:
+        price_tag_crud.create(db, price_tag)
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
 
 
 @router.get("/price_tag/{price_tag_id}",
@@ -27,8 +36,14 @@ def get_all_price_tags(db: Session = Depends(get_db)):
 
 
 @router.put("/price_tag/delete/{price_tag_id}", status_code=status.HTTP_200_OK)
-def delete_price_tag(price_tag_id: int, db: Session = Depends(get_db)):
-    price_tag_crud.delete(db, price_tag_id)
+def delete_price_tag(price_tag_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    if user.is_staff:
+        price_tag_crud.delete(db, price_tag_id)
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
 
 
 @router.put("/price_tag/update/{price_tag_id}", status_code=status.HTTP_200_OK)

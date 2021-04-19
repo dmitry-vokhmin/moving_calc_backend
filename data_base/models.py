@@ -176,7 +176,7 @@ class Address(Base, mixin.IdMixin):
 
 class ZipCode(Base, mixin.IdMixin):
     __tablename__ = "zip_code"
-    zip_code = Column(String, nullable=False)
+    zip_code = Column(String, nullable=False, unique=True)
     city = Column(String, nullable=False)
     state = Column(String, nullable=False)
     address = relationship("Address")

@@ -1,7 +1,6 @@
 from typing import List
 from fastapi import Depends, APIRouter, status
 from data_base.database import get_db
-from data_base import models
 from schemas import address as address_schema
 from crud import address as address_crud
 from sqlalchemy.orm import Session
