@@ -3,7 +3,7 @@ from .move_size import MoveSizeGet
 
 
 class InventoryCollectionBase(BaseModel):
-    pass
+    user_id: int
 
     class Config:
         orm_mode = True

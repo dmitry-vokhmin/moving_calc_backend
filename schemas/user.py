@@ -1,10 +1,12 @@
 import re
+from typing import Optional
 from pydantic import BaseModel, EmailStr, SecretStr, validator
 
 
 class UserBase(BaseModel):
     username: str
     email: EmailStr
+    company_id: Optional[int]
 
     @validator("username")
     def empty_str(cls, v):

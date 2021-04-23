@@ -16,11 +16,12 @@ def create_services(services: services_schema.ServicesCreate,
                     user: User = Depends(get_current_user)):
     if user.is_staff:
         services_crud.create(db, services)
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 
 @router.get("/service/{services_id}", response_model=services_schema.ServicesGet, status_code=status.HTTP_200_OK)
@@ -31,3 +32,30 @@ def get_services(services_id: int, q: str = None, db: Session = Depends(get_db))
 @router.get("/service/", response_model=List[services_schema.ServicesGet], status_code=status.HTTP_200_OK)
 def get_all_services(db: Session = Depends(get_db)):
     return services_crud.read_all(db)
+
+
+@router.put("/service/delete/{service_id}", status_code=status.HTTP_200_OK)
+def delete_service(service_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    if user.is_staff:
+        services_crud.delete(db, service_id)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+
+@router.put("/service/update/{service_id}", status_code=status.HTTP_200_OK)
+def update_service(service_id: int,
+                   service: services_schema.ServicesBase,
+                   db: Session = Depends(get_db),
+                   user: User = Depends(get_current_user)):
+    if user.is_staff:
+        services_crud.update(db, service_id, service)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )

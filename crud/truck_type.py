@@ -4,13 +4,13 @@ from fastapi import HTTPException
 from schemas import truck_type as truck_type_schema
 
 
-def read(db: Session, id: int):
-    query = db.query(models.TruckType).filter(models.TruckType.id == id)
+def read(db: Session, id: int, user_id: int):
+    query = db.query(models.TruckType).filter_by(id=id, user_id=user_id)
     return query.first()
 
 
-def create(db: Session, truck_type: truck_type_schema.TruckTypeCreate):
-    truck_type_db = models.TruckType(**truck_type.dict())
+def create(db: Session, truck_type: truck_type_schema.TruckTypeCreate, user_id: int):
+    truck_type_db = models.TruckType(**truck_type.dict(), user_id=user_id)
     db.add(truck_type_db)
     try:
         db.commit()
@@ -18,13 +18,13 @@ def create(db: Session, truck_type: truck_type_schema.TruckTypeCreate):
         raise HTTPException(status_code=400, detail=str(e))
 
 
-def read_all(db: Session):
-    query = db.query(models.TruckType)
+def read_all(db: Session, user_id: int):
+    query = db.query(models.TruckType).filter_by(user_id=user_id)
     return query.all()
 
 
-def delete(db: Session, truck_type_id: int):
-    db.query(models.TruckType).filter_by(id=truck_type_id).delete()
+def delete(db: Session, truck_type_id: int, user_id: int):
+    db.query(models.TruckType).filter_by(id=truck_type_id, user_id=user_id).delete()
     try:
         db.commit()
     except Exception as e:
@@ -32,8 +32,8 @@ def delete(db: Session, truck_type_id: int):
         raise HTTPException(status_code=400, detail=str(e))
 
 
-def update(db: Session, truck_type_id: int, truck_type: truck_type_schema.TruckTypeBase):
-    db.query(models.TruckType).filter_by(id=truck_type_id).update({**truck_type.dict()})
+def update(db: Session, truck_type_id: int, truck_type: truck_type_schema.TruckTypeBase, user_id: int):
+    db.query(models.TruckType).filter_by(id=truck_type_id, user_id=user_id).update({**truck_type.dict()})
     try:
         db.commit()
     except Exception as e:

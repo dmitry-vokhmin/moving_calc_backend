@@ -27,3 +27,4 @@ class InventoryCreate(InventoryBase):
 
 class InventoryGet(InventoryBase):
     id: int
+    user_id: int

@@ -1,8 +1,7 @@
 from pydantic import BaseModel, validator
-from .truck_type import TruckTypeGet
 
 
-class TruckBase(BaseModel):
+class PriceTagNameBase(BaseModel):
     name: str
 
     class Config:
@@ -15,11 +14,9 @@ class TruckBase(BaseModel):
         return v
 
 
-class TruckCreate(TruckBase):
-    truck_type_id: int
+class PriceTagNameCreate(PriceTagNameBase):
+    pass
 
 
-class TruckGet(TruckBase):
+class PriceTagNameGet(PriceTagNameBase):
     id: int
-    truck_type: TruckTypeGet
-    user_id: int

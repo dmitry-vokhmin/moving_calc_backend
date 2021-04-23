@@ -16,11 +16,12 @@ def create_room_collection(room_collection: room_collection_schema.RoomCollectio
                            user: User = Depends(get_current_user)):
     if user.is_staff:
         room_collection_crud.create(db, room_collection)
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 
 @router.post("/room_collection/{room_id}")
@@ -29,11 +30,12 @@ def update_many_to_many(room_id: int, inventory: List[int],
                         user: User = Depends(get_current_user)):
     if user.is_staff:
         room_collection_crud.update_many_to_many_inventory(db, room_id, inventory)
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 
 @router.get("/room_collection/{room_collection_id}",
@@ -48,3 +50,6 @@ def get_room_collection(room_collection_id: int, db: Session = Depends(get_db)):
             status_code=status.HTTP_200_OK)
 def get_all_room_collections(db: Session = Depends(get_db)):
     return room_collection_crud.read_all(db)
+
+
+

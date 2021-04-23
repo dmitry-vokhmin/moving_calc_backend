@@ -2,6 +2,7 @@ from pydantic import BaseModel
 
 
 class TruckTypeBase(BaseModel):
+    name: str
     price: int
     length: float
     height: float
@@ -17,3 +18,4 @@ class TruckTypeCreate(TruckTypeBase):
 
 class TruckTypeGet(TruckTypeBase):
     id: int
+    user_id: int

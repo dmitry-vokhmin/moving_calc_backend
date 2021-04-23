@@ -16,11 +16,12 @@ def create_zip_code(zip_code: zip_code_schema.ZipCodeCreate,
                     user: User = Depends(get_current_user)):
     if user.is_staff:
         zip_code_crud.create(db, zip_code)
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 
 @router.get("/zip_code/{zip_code_id}", response_model=zip_code_schema.ZipCodeGet, status_code=status.HTTP_200_OK)

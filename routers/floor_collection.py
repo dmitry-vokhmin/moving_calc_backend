@@ -16,11 +16,12 @@ def create_floor_collection(floor_collection: floor_collection_schema.FloorColle
                             user: User = Depends(get_current_user)):
     if user.is_staff:
         floor_collection_crud.create(db, floor_collection)
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 
 @router.get("/floor_collection/{floor_collection_id}",

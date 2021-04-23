@@ -14,21 +14,28 @@ router = APIRouter(tags=["Inventory"])
 def create_inventory(inventory: inventory_schema.InventoryCreate,
                      db: Session = Depends(get_db),
                      user: User = Depends(get_current_user)):
-    if user.is_staff:
-        inventory_crud.create(db, inventory)
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    inventory_crud.create(db, inventory, user.id)
 
 
 @router.get("/inventory/{inventory_id}", response_model=inventory_schema.InventoryGet, status_code=status.HTTP_200_OK)
-def get_inventory(inventory_id: int, db: Session = Depends(get_db)):
-    return inventory_crud.read(db, inventory_id)
+def get_inventory(inventory_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    return inventory_crud.read(db, inventory_id, user.id)
 
 
 @router.get("/inventory/all/{room_name}", response_model=List[inventory_schema.InventoryGet],
             status_code=status.HTTP_200_OK)
-def get_all_inventory(room_name: str, db: Session = Depends(get_db)):
-    return inventory_crud.read_all(db, room_name)
+def get_all_inventory(room_name: str, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    return inventory_crud.read_all(db, room_name, user.id)
+
+
+@router.put("/inventory/delete/{inventory_id}", status_code=status.HTTP_200_OK)
+def delete_inventory(inventory_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    inventory_crud.delete(db, inventory_id, user.id)
+
+
+@router.put("/inventory/update/{inventory_id}", status_code=status.HTTP_200_OK)
+def update_inventory(inventory_id: int,
+                     inventory: inventory_schema.InventoryBase,
+                     db: Session = Depends(get_db),
+                     user: User = Depends(get_current_user)):
+    inventory_crud.update(db, inventory_id, inventory, user.id)

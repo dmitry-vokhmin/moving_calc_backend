@@ -15,9 +15,13 @@ from routers import truck_type
 from routers import inventory_collection
 from routers import mover_price
 from routers import user
+from routers import mover_amount
+from routers import price_tag_name
+from routers import company
 
 app = FastAPI(title="some_service", description="", version="0.0.1")
 app.include_router(user.router)
+app.include_router(company.router)
 app.include_router(inventory.router)
 app.include_router(user_client.router)
 app.include_router(room_collections.router)
@@ -27,16 +31,15 @@ app.include_router(move_size.router)
 app.include_router(floor_collection.router)
 app.include_router(calendar.router)
 app.include_router(price_tag.router)
+app.include_router(price_tag_name.router)
 app.include_router(mover_price.router)
+app.include_router(mover_amount.router)
 app.include_router(services.router)
 app.include_router(address.router)
 app.include_router(zip_code.router)
 app.include_router(truck.router)
 app.include_router(truck_type.router)
 app.include_router(calculate.router)
-
-
-
 
 if __name__ == '__main__':
     import uvicorn

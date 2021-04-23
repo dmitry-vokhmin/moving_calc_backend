@@ -4,13 +4,13 @@ from fastapi import HTTPException
 from schemas import mover_price as mover_price_schema
 
 
-def read(db: Session, id: int):
-    query = db.query(models.MoverPrice).filter(models.MoverPrice.id == id)
+def read(db: Session, id: int, user_id):
+    query = db.query(models.MoverPrice).filter_by(id=id, user_id=user_id)
     return query.first()
 
 
-def create(db: Session, mover_price: mover_price_schema.MoverPriceCreate):
-    mover_price_db = models.MoverPrice(**mover_price.dict())
+def create(db: Session, mover_price: mover_price_schema.MoverPriceCreate, user_id):
+    mover_price_db = models.MoverPrice(**mover_price.dict(), user_id=user_id)
     db.add(mover_price_db)
     try:
         db.commit()
@@ -18,13 +18,13 @@ def create(db: Session, mover_price: mover_price_schema.MoverPriceCreate):
         raise HTTPException(status_code=400, detail=str(e))
 
 
-def read_all(db: Session):
-    query = db.query(models.MoverPrice)
+def read_all(db: Session, user_id):
+    query = db.query(models.MoverPrice).filter_by(user_id=user_id)
     return query.all()
 
 
-def delete(db: Session, mover_price_id: int):
-    db.query(models.MoverPrice).filter_by(id=mover_price_id).delete()
+def delete(db: Session, mover_price_id: int, user_id):
+    db.query(models.MoverPrice).filter_by(id=mover_price_id, user_id=user_id).delete()
     try:
         db.commit()
     except Exception as e:
@@ -32,8 +32,8 @@ def delete(db: Session, mover_price_id: int):
         raise HTTPException(status_code=400, detail=str(e))
 
 
-def update(db: Session, mover_price_id: int, mover_price: mover_price_schema.MoverPriceBase):
-    db.query(models.MoverPrice).filter_by(id=mover_price_id).update({"price": mover_price.price})
+def update(db: Session, mover_price_id: int, mover_price: mover_price_schema.MoverPriceCreate, user_id):
+    db.query(models.MoverPrice).filter_by(id=mover_price_id, user_id=user_id).update({**mover_price.dict()})
     try:
         db.commit()
     except Exception as e:

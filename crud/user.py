@@ -9,7 +9,8 @@ def create(db: Session, user: user_schema.UserCreate):
     user_db = models.User(
         username=user.username,
         email=user.email,
-        password=get_secret_hash(user.password.get_secret_value())
+        password=get_secret_hash(user.password.get_secret_value()),
+        company_id=user.company_id
     )
     db.add(user_db)
     try:

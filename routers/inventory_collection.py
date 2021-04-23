@@ -16,27 +16,62 @@ def create_inventory_collection(inventory_collection: inventory_collection_schem
                                 user: User = Depends(get_current_user)):
     if user.is_staff:
         inventory_collection_crud.create(db, inventory_collection)
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 
 @router.post("/inventory_collection/{move_size_id}", status_code=status.HTTP_201_CREATED)
-def update_many_to_many(move_size_id: int, inventory: List[int], db: Session = Depends(get_db)):
-    inventory_collection_crud.update_many_to_many_inventory(db, move_size_id, inventory)
+def update_many_to_many(move_size_id: int,
+                        inventory: List[int],
+                        db: Session = Depends(get_db),
+                        user: User = Depends(get_current_user)):
+    inventory_collection_crud.update_many_to_many_inventory(db, move_size_id, inventory, user.id)
 
 
 @router.get("/inventory_collection/{inventory_collection_id}",
             response_model=inventory_collection_schema.InventoryCollectionGet,
             status_code=status.HTTP_200_OK)
-def get_inventory_collection(inventory_collection_id: int, db: Session = Depends(get_db)):
-    return inventory_collection_crud.read(db, inventory_collection_id)
+def get_inventory_collection(inventory_collection_id: int,
+                             db: Session = Depends(get_db),
+                             user: User = Depends(get_current_user)):
+    return inventory_collection_crud.read(db, inventory_collection_id, user.id)
 
 
 @router.get("/inventory_collection/",
             response_model=List[inventory_collection_schema.InventoryCollectionGet],
             status_code=status.HTTP_200_OK)
-def get_all_inventory_collection(db: Session = Depends(get_db)):
-    return inventory_collection_crud.read_all(db)
+def get_all_inventory_collection(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    return inventory_collection_crud.read_all(db, user.id)
+
+
+@router.put("/inventory_collection/delete/{inventory_collection_id}", status_code=status.HTTP_200_OK)
+def delete_inventory_collection(inventory_collection_id: int,
+                                db: Session = Depends(get_db),
+                                user: User = Depends(get_current_user)):
+    if user.is_staff:
+        inventory_collection_crud.delete(db, inventory_collection_id)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+
+@router.put("/inventory_collection/update/{inventory_collection_id}", status_code=status.HTTP_200_OK)
+def update_inventory_collection(inventory_collection_id: int,
+                                inventory_collection: inventory_collection_schema.InventoryCollectionCreate,
+                                db: Session = Depends(get_db),
+                                user: User = Depends(get_current_user)):
+    if user.is_staff:
+        inventory_collection_crud.update(db, inventory_collection_id, inventory_collection)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )

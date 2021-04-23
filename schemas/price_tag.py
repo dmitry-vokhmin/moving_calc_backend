@@ -1,23 +1,19 @@
-from pydantic import BaseModel, validator
+from pydantic import BaseModel
+from .price_tag_name import PriceTagNameGet
 
 
 class PriceTagBase(BaseModel):
-    name: str
     price: int
 
     class Config:
         orm_mode = True
 
-    @validator("name")
-    def empty_str(cls, v):
-        if v == "":
-            raise ValueError("Empty string")
-        return v
-
 
 class PriceTagCreate(PriceTagBase):
-    pass
+    price_tag_name_id: int
 
 
 class PriceTagGet(PriceTagBase):
     id: int
+    user_id: int
+    price_tag_name: PriceTagNameGet

@@ -16,11 +16,12 @@ def create_move_size(move_size: move_size_schema.MoveSizeCreate,
                      user: User = Depends(get_current_user)):
     if user.is_staff:
         move_size_crud.create(db, move_size)
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 
 @router.get("/move_size/{move_size_id}", response_model=move_size_schema.MoveSizeGet, status_code=status.HTTP_200_OK)

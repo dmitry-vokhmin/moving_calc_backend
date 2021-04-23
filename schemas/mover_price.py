@@ -1,8 +1,8 @@
 from pydantic import BaseModel
+from .mover_amount import MoverAmountGet
 
 
 class MoverPriceBase(BaseModel):
-    movers: int
     price: int
 
     class Config:
@@ -10,8 +10,10 @@ class MoverPriceBase(BaseModel):
 
 
 class MoverPriceCreate(MoverPriceBase):
-    pass
+    mover_amount_id: int
 
 
 class MoverPriceGet(MoverPriceBase):
     id: int
+    user_id: int
+    mover_amount: MoverAmountGet

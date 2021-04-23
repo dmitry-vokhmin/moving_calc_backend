@@ -33,6 +33,7 @@ inventory_inventory_collection = Table(
 
 class Inventory(Base, mixin.IdMixin, mixin.NameMixin):
     __tablename__ = "inventory"
+    is_public = Column(Boolean, default=False, nullable=False, index=True)
     height = Column(Float, nullable=True)
     width = Column(Float, nullable=True)
     length = Column(Float, nullable=True)
@@ -41,12 +42,15 @@ class Inventory(Base, mixin.IdMixin, mixin.NameMixin):
     unit = Column(Integer, nullable=True)
     room_collections = relationship("RoomCollection", secondary=inventory_room_collection)
     inventory_collections = relationship("InventoryCollection", secondary=inventory_inventory_collection)
+    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+    users = relationship("User")
 
-    def __init__(self, name, unit=None, dimension=None, height=None, width=None, length=None, weight=None):
+    def __init__(self, name, user_id, unit=None, dimension=None, height=None, width=None, length=None, weight=None):
         if not dimension:
             if all((height, width, length)):
                 dimension = height * width * length
         self.dimension = dimension
+        self.user_id = user_id
         self.name = name
         self.unit = unit
         self.height = height
@@ -99,9 +103,12 @@ class RoomCollection(Base, mixin.IdMixin, mixin.NameMixin):
 
 class InventoryCollection(Base, mixin.IdMixin):
     __tablename__ = "inventory_collection"
+    is_public = Column(Boolean, default=False, nullable=False, index=True)
     move_size_id = Column(Integer, ForeignKey("move_size.id"), nullable=False)
     move_size = relationship("MoveSize", lazy="joined")
     inventories = relationship("Inventory", secondary=inventory_inventory_collection)
+    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+    users = relationship("User")
 
 
 class InventoryOrder(Base, mixin.IdMixin):
@@ -124,9 +131,11 @@ class Truck(Base, mixin.IdMixin):
     name = Column(String, nullable=False, unique=True)
     truck_type_id = Column(Integer, ForeignKey("truck_type.id", ondelete="CASCADE"), nullable=False)
     truck_type = relationship("TruckType", lazy="joined")
+    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+    users = relationship("User")
 
 
-class TruckType(Base, mixin.IdMixin):
+class TruckType(Base, mixin.IdMixin, mixin.NameMixin):
     __tablename__ = "truck_type"
     __table_args__ = (UniqueConstraint("height", "width", "length", name="_size"),)
     price = Column(Integer, nullable=False)
@@ -134,26 +143,48 @@ class TruckType(Base, mixin.IdMixin):
     width = Column(Float, nullable=False)
     length = Column(Float, nullable=False)
     trucks = relationship("Truck", cascade="all, delete", passive_deletes=True)
+    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+    users = relationship("User")
 
 
 class Calendar(Base, mixin.IdMixin):
     __tablename__ = "calendar"
-    start_date = Column(Date, nullable=False, unique=True)
-    end_date = Column(Date, nullable=False, unique=True)
+    start_date = Column(Date, nullable=False)
+    end_date = Column(Date, nullable=False)
     price_tag_id = Column(Integer, ForeignKey("price_tag.id"), nullable=False)
     price_tag = relationship("PriceTag", lazy="joined")
+    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+    users = relationship("User")
 
 
-class PriceTag(Base, mixin.IdMixin, mixin.NameMixin):
+class PriceTag(Base, mixin.IdMixin):
     __tablename__ = "price_tag"
     price = Column(Integer, nullable=False, unique=True)
+    price_tag_name_id = Column(Integer, ForeignKey("price_tag_name.id"), nullable=False)
+    price_tag_name = relationship("PriceTagName", lazy="joined")
     calendar = relationship("Calendar")
+    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+    users = relationship("User")
+
+
+class PriceTagName(Base, mixin.IdMixin, mixin.NameMixin):
+    __tablename__ = "price_tag_name"
+    price_tag = relationship("PriceTag")
 
 
 class MoverPrice(Base, mixin.IdMixin):
     __tablename__ = "mover_price"
-    movers = Column(Integer, nullable=False, unique=True)
     price = Column(Integer, nullable=False, unique=True)
+    mover_amount_id = Column(Integer, ForeignKey("mover_amount.id"), nullable=False)
+    mover_amount = relationship("MoverAmount")
+    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+    users = relationship("User")
+
+
+class MoverAmount(Base, mixin.IdMixin):
+    __tablename__ = "mover_amount"
+    amount = Column(Integer, nullable=False, unique=True)
+    mover_prices = relationship("MoverPrice")
 
 
 class Service(Base, mixin.IdMixin, mixin.NameMixin):
@@ -188,3 +219,18 @@ class User(Base, mixin.IdMixin):
     password = Column(String, nullable=False)
     email = Column(String, nullable=False, unique=True)
     is_staff = Column(Boolean, nullable=False, default=False)
+    trucks = relationship("Truck")
+    truck_types = relationship("TruckType")
+    price_tags = relationship("PriceTag")
+    mover_prices = relationship("MoverPrice")
+    calendars = relationship("Calendar")
+    inventories = relationship("Inventory")
+    inventory_collections = relationship("InventoryCollection")
+    company_id = Column(Integer, ForeignKey("company.id"))
+    companies = relationship("Company")
+
+
+class Company(Base, mixin.IdMixin, mixin.NameMixin):
+    __tablename__ = "company"
+    admin_id = Column(Integer, nullable=False)
+    admin = relationship("User")
