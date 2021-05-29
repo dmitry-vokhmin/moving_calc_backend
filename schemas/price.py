@@ -11,9 +11,10 @@ class MoverPriceBase(BaseModel):
 
 class MoverPriceCreate(MoverPriceBase):
     mover_amount_id: int
+    price_tag_id: int
 
 
 class MoverPriceGet(MoverPriceBase):
     id: int
-    user_id: int
+    company_id: int
     mover_amount: MoverAmountGet

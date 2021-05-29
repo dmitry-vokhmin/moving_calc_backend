@@ -25,16 +25,16 @@ def get_price_tag(price_tag_id: int, db: Session = Depends(get_db), user: User =
 
 
 @router.get("/price_tag/", response_model=List[price_tag_schema.PriceTagGet], status_code=status.HTTP_200_OK)
-def get_all_price_tags(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    return price_tag_crud.read_all(db, user.id)
+def get_all_price_tags(db: Session = Depends(get_db)):
+    return price_tag_crud.read_all(db)
 
 
-@router.put("/price_tag/delete/{price_tag_id}", status_code=status.HTTP_200_OK)
+@router.delete("/price_tag/", status_code=status.HTTP_200_OK)
 def delete_price_tag(price_tag_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     price_tag_crud.delete(db, price_tag_id, user.id)
 
 
-@router.put("/price_tag/update/{price_tag_id}", status_code=status.HTTP_200_OK)
+@router.put("/price_tag/", status_code=status.HTTP_200_OK)
 def update_price_tag(
         price_tag_id: int,
         price_tag: price_tag_schema.PriceTagCreate,

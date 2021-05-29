@@ -1,14 +1,16 @@
 import re
 from typing import Optional
 from pydantic import BaseModel, EmailStr, SecretStr, validator
+from schemas.user_role import UserRoleGet
 
 
 class UserBase(BaseModel):
-    username: str
+    fullname: str
     email: EmailStr
     company_id: Optional[int]
+    user_role_id: Optional[int]
 
-    @validator("username")
+    @validator("fullname")
     def empty_str(cls, v):
         if v == "":
             raise ValueError("Empty string")
@@ -32,18 +34,24 @@ class UserCreate(UserBase):
             raise ValueError("Make sure your password has at least 1 capital letter")
         if re.search("[0-9]", password) is None:
             raise ValueError("Make sure your password has at least 1 digit")
-        if re.search("[@$!#%*?&]", password) is None:
-            raise ValueError("At least 1 character from  @$!#%*?&")
         if re.search("\s", password):
             raise ValueError("Make sure your password does not have whitespace characters")
         return v
 
 
 class UserAuth(BaseModel):
-    username: str
+    email: str
     password: SecretStr
+
+
+class UserUpdate(UserCreate):
+    old_password: Optional[SecretStr]
+    password: Optional[SecretStr]
+    email: Optional[EmailStr]
+    id: int
 
 
 class UserGet(UserBase):
     id: int
+    user_role: UserRoleGet
     is_staff: bool

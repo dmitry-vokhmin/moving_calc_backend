@@ -3,7 +3,6 @@ from pydantic import BaseModel, validator
 
 class CompanyBase(BaseModel):
     name: str
-    admin_id: int
 
     class Config:
         orm_mode = True

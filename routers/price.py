@@ -2,8 +2,8 @@ from typing import List
 from fastapi import Depends, APIRouter, status, HTTPException
 from sqlalchemy.orm import Session
 from data_base.database import get_db
-from schemas import mover_price as mover_price_schema
-from crud import mover_price as mover_price_crud
+from schemas import price as mover_price_schema
+from crud import price as mover_price_crud
 from security.security import get_current_user
 from data_base.models import User
 

@@ -30,6 +30,13 @@ inventory_inventory_collection = Table(
     Column("inventory_collection_id", Integer, ForeignKey("inventory_collection.id"))
 )
 
+user_role_user_privilege = Table(
+    "user_role_user_privilege",
+    Base.metadata,
+    Column("user_role_id", Integer, ForeignKey("user_role.id")),
+    Column("user_privilege_id", Integer, ForeignKey("user_privilege.id"))
+)
+
 
 class Inventory(Base, mixin.IdMixin, mixin.NameMixin):
     __tablename__ = "inventory"
@@ -42,15 +49,15 @@ class Inventory(Base, mixin.IdMixin, mixin.NameMixin):
     unit = Column(Integer, nullable=True)
     room_collections = relationship("RoomCollection", secondary=inventory_room_collection)
     inventory_collections = relationship("InventoryCollection", secondary=inventory_inventory_collection)
-    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
-    users = relationship("User")
+    company_id = Column(Integer, ForeignKey("company.id"), nullable=False)
+    companies = relationship("Company")
 
-    def __init__(self, name, user_id, unit=None, dimension=None, height=None, width=None, length=None, weight=None):
+    def __init__(self, name, company_id, unit=None, dimension=None, height=None, width=None, length=None, weight=None):
         if not dimension:
             if all((height, width, length)):
                 dimension = height * width * length
         self.dimension = dimension
-        self.user_id = user_id
+        self.company_id = company_id
         self.name = name
         self.unit = unit
         self.height = height
@@ -107,8 +114,8 @@ class InventoryCollection(Base, mixin.IdMixin):
     move_size_id = Column(Integer, ForeignKey("move_size.id"), nullable=False)
     move_size = relationship("MoveSize", lazy="joined")
     inventories = relationship("Inventory", secondary=inventory_inventory_collection)
-    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
-    users = relationship("User")
+    company_id = Column(Integer, ForeignKey("company.id"), nullable=False)
+    companies = relationship("Company")
 
 
 class InventoryOrder(Base, mixin.IdMixin):
@@ -131,20 +138,31 @@ class Truck(Base, mixin.IdMixin):
     name = Column(String, nullable=False, unique=True)
     truck_type_id = Column(Integer, ForeignKey("truck_type.id", ondelete="CASCADE"), nullable=False)
     truck_type = relationship("TruckType", lazy="joined")
-    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
-    users = relationship("User")
+    company_id = Column(Integer, ForeignKey("company.id"), nullable=False)
+    companies = relationship("Company")
 
 
 class TruckType(Base, mixin.IdMixin, mixin.NameMixin):
     __tablename__ = "truck_type"
     __table_args__ = (UniqueConstraint("height", "width", "length", name="_size"),)
-    price = Column(Integer, nullable=False)
-    height = Column(Float, nullable=False)
-    width = Column(Float, nullable=False)
-    length = Column(Float, nullable=False)
+    dimension = Column(Float, nullable=False)
+    height = Column(Float, nullable=True)
+    width = Column(Float, nullable=True)
+    length = Column(Float, nullable=True)
     trucks = relationship("Truck", cascade="all, delete", passive_deletes=True)
-    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
-    users = relationship("User")
+    company_id = Column(Integer, ForeignKey("company.id"), nullable=False)
+    companies = relationship("Company")
+
+    def __init__(self, name, company_id, dimension=None, height=None, width=None, length=None):
+        if not dimension:
+            if all((height, width, length)):
+                dimension = height * width * length
+        self.dimension = dimension
+        self.company_id = company_id
+        self.name = name
+        self.height = height
+        self.width = width
+        self.length = length
 
 
 class Calendar(Base, mixin.IdMixin):
@@ -153,38 +171,31 @@ class Calendar(Base, mixin.IdMixin):
     end_date = Column(Date, nullable=False)
     price_tag_id = Column(Integer, ForeignKey("price_tag.id"), nullable=False)
     price_tag = relationship("PriceTag", lazy="joined")
-    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
-    users = relationship("User")
+    company_id = Column(Integer, ForeignKey("company.id"), nullable=False)
+    companies = relationship("Company")
 
 
-class PriceTag(Base, mixin.IdMixin):
+class PriceTag(Base, mixin.IdMixin, mixin.NameMixin):
     __tablename__ = "price_tag"
-    price = Column(Integer, nullable=False, unique=True)
-    price_tag_name_id = Column(Integer, ForeignKey("price_tag_name.id"), nullable=False)
-    price_tag_name = relationship("PriceTagName", lazy="joined")
     calendar = relationship("Calendar")
-    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
-    users = relationship("User")
+    prices = relationship("Price")
 
 
-class PriceTagName(Base, mixin.IdMixin, mixin.NameMixin):
-    __tablename__ = "price_tag_name"
-    price_tag = relationship("PriceTag")
-
-
-class MoverPrice(Base, mixin.IdMixin):
+class Price(Base, mixin.IdMixin):
     __tablename__ = "mover_price"
-    price = Column(Integer, nullable=False, unique=True)
+    price = Column(Integer, nullable=False)
     mover_amount_id = Column(Integer, ForeignKey("mover_amount.id"), nullable=False)
-    mover_amount = relationship("MoverAmount")
-    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
-    users = relationship("User")
+    mover_amount = relationship("MoverAmount", lazy="joined")
+    price_tag_id = Column(Integer, ForeignKey("price_tag.id"), nullable=False)
+    price_tag = relationship("PriceTag")
+    company_id = Column(Integer, ForeignKey("company.id"), nullable=False)
+    companies = relationship("Company")
 
 
 class MoverAmount(Base, mixin.IdMixin):
     __tablename__ = "mover_amount"
     amount = Column(Integer, nullable=False, unique=True)
-    mover_prices = relationship("MoverPrice")
+    prices = relationship("Price")
 
 
 class Service(Base, mixin.IdMixin, mixin.NameMixin):
@@ -215,22 +226,37 @@ class ZipCode(Base, mixin.IdMixin):
 
 class User(Base, mixin.IdMixin):
     __tablename__ = "user"
-    username = Column(String, nullable=False, unique=True)
+    fullname = Column(String, nullable=False)
     password = Column(String, nullable=False)
     email = Column(String, nullable=False, unique=True)
     is_staff = Column(Boolean, nullable=False, default=False)
-    trucks = relationship("Truck")
-    truck_types = relationship("TruckType")
-    price_tags = relationship("PriceTag")
-    mover_prices = relationship("MoverPrice")
-    calendars = relationship("Calendar")
-    inventories = relationship("Inventory")
-    inventory_collections = relationship("InventoryCollection")
     company_id = Column(Integer, ForeignKey("company.id"))
-    companies = relationship("Company")
+    company = relationship("Company")
+    user_role_id = Column(Integer, ForeignKey("user_role.id"))
+    user_role = relationship("UserRole", lazy="joined")
+
+
+class UserRole(Base, mixin.IdMixin):
+    __tablename__ = "user_role"
+    role = Column(String, nullable=False, unique=True)
+    parent_id = Column(Integer, ForeignKey("user_role.id"))
+    parent = relationship("UserRole", backref="child", remote_side="UserRole.id")
+    user = relationship("User")
+    user_privilege = relationship("UserPrivilege", secondary=user_role_user_privilege)
+
+
+class UserPrivilege(Base, mixin.IdMixin):
+    __tablename__ = "user_privilege"
+    privilege = Column(String, nullable=False, unique=True)
+    user_role = relationship("UserRole", secondary=user_role_user_privilege)
 
 
 class Company(Base, mixin.IdMixin, mixin.NameMixin):
     __tablename__ = "company"
-    admin_id = Column(Integer, nullable=False)
-    admin = relationship("User")
+    users = relationship("User")
+    trucks = relationship("Truck")
+    truck_types = relationship("TruckType")
+    prices = relationship("Price")
+    calendars = relationship("Calendar")
+    inventories = relationship("Inventory")
+    inventory_collections = relationship("InventoryCollection")

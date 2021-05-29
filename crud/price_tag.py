@@ -19,8 +19,8 @@ def create(db: Session, price_tag: price_tag_schema.PriceTagCreate, user_id: int
         raise HTTPException(status_code=400, detail=str(e))
 
 
-def read_all(db: Session, user_id: int):
-    query = db.query(models.PriceTag).filter_by(user_id=user_id)
+def read_all(db: Session):
+    query = db.query(models.PriceTag)
     return query.all()
 
 

@@ -19,7 +19,11 @@ class TruckCreate(TruckBase):
     truck_type_id: int
 
 
+class TruckUpdate(TruckCreate):
+    id: int
+
+
 class TruckGet(TruckBase):
     id: int
     truck_type: TruckTypeGet
-    user_id: int
+    company_id: int
