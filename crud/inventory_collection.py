@@ -3,10 +3,12 @@ from sqlalchemy.orm import Session
 from data_base import models
 from fastapi import HTTPException
 from schemas import inventory_collection as inventory_collection_schema
+from security.security import get_user, check_privilege
+from crud.inventory import read as read_inventory
 
 
-def read(db: Session, id: int, user_id: int):
-    query = db.query(models.InventoryCollection).filter_by(id=id, user_id=user_id)
+def read(db: Session, move_size_id: int, company_id: int):
+    query = db.query(models.InventoryCollection).filter_by(move_size_id=move_size_id, company_id=company_id)
     return query.first()
 
 
@@ -16,16 +18,88 @@ def create(db: Session, inventory_collection: inventory_collection_schema.Invent
     try:
         db.commit()
     except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=str(e))
+    return inventory_collection_db
+
+
+def add_to_personal(db: Session,
+                    inventory_collection: inventory_collection_schema.InventoryCollectionCreatePersonal,
+                    user_id: int):
+    user_db = get_user(db, user_id)
+    check_privilege(db, user_db, "inventory")
+    inventory_collection_db = read(db, inventory_collection.move_size_id, user_db.company_id)
+    inventory_db = read_inventory(db, inventory_collection.inventory_id)
+    inventory_collection_db.inventories.append(inventory_db)
+    try:
+        db.commit()
+    except Exception as e:
+        db.rollback()
         raise HTTPException(status_code=400, detail=str(e))
 
 
+# def get_or_create_inventory_collection(db: Session, inventory_collection, company_id):
+#     inventory_collection_db = db.query(models.InventoryCollection).filter_by(
+#         move_size_id=inventory_collection.move_size_id, company_id=company_id
+#     ).first()
+#     if not inventory_collection_db:
+#         inventory_collection = inventory_collection_schema.InventoryCollectionCreate(
+#             move_size_id=inventory_collection.move_size_id,
+#             company_id=company_id
+#         )
+#         inventory_collection_db = create(db, inventory_collection)
+#         inventory_collection_id = db.query(models.InventoryCollection).filter_by(
+#             move_size_id=inventory_collection.move_size_id, is_public=True).first()
+#         inventory_collection_db.inventories.extend(db.query(models.Inventory).filter(
+#             models.Inventory.inventory_collections.any(id=inventory_collection_id.id)).all())
+#     return inventory_collection_db
+
+
+# def read_all(db: Session, user_id: int):
+#     user_db = get_user(db, user_id)
+#     check_privilege(db, user_db, "inventory")
+#     user_inventory = db.query(models.InventoryCollection).filter_by(company_id=user_db.company_id).all()
+#     if user_inventory:
+#         query = db.query(models.InventoryCollection).filter(models.InventoryCollection.move_size_id.notin_(
+#             [inventory.move_size_id for inventory in user_inventory]
+#         )).all()
+#         query.extend(user_inventory)
+#     else:
+#         query = db.query(models.InventoryCollection).all()
+#     return query
+
 def read_all(db: Session, user_id: int):
-    query = db.query(models.InventoryCollection).filter_by(user_id=user_id)
-    return query.all()
+    user_db = get_user(db, user_id)
+    check_privilege(db, user_db, "inventory")
+    user_inventory_collection = db.query(models.InventoryCollection).filter_by(company_id=user_db.company_id).all()
+    if not user_inventory_collection:
+        create_user_collection(db, user_db)
+        user_inventory_collection = db.query(models.InventoryCollection).filter_by(company_id=user_db.company_id).all()
+    return user_inventory_collection
 
 
-def delete(db: Session, inventory_collection_id: int):
-    db.query(models.InventoryCollection).filter_by(id=inventory_collection_id).delete()
+def create_user_collection(db, user_db):
+    for inventory_collection in db.query(models.InventoryCollection).all():
+        create_schema = inventory_collection_schema.InventoryCollectionCreate(
+            move_size_id=inventory_collection.move_size_id,
+            company_id=user_db.company_id
+        )
+        user_collection = create(db, create_schema)
+        user_collection.inventories.extend(inventory_collection.inventories)
+    try:
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+def delete_inventory(db: Session, inventory_id: int, inventory_collection_id: int, user_id: int):
+    user_db = get_user(db, user_id)
+    check_privilege(db, user_db, "inventory")
+    inventory_collection_db = db.query(models.InventoryCollection).filter_by(id=inventory_collection_id,
+                                                                             company_id=user_db.company_id).first()
+    inventory_db = db.query(models.Inventory).filter_by(id=inventory_id).first()
+    inventory_collection_db.inventories.remove(inventory_db)
     try:
         db.commit()
     except Exception as e:

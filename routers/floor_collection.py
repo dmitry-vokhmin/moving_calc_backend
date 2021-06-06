@@ -4,7 +4,7 @@ from data_base.database import get_db
 from schemas import floor_collection as floor_collection_schema
 from crud import floor_collection as floor_collection_crud
 from sqlalchemy.orm import Session
-from security.security import get_current_user
+from security.security import get_user_id
 from data_base.models import User
 
 router = APIRouter(tags=["Floor collection"])
@@ -13,7 +13,7 @@ router = APIRouter(tags=["Floor collection"])
 @router.post("/floor_collection/", status_code=status.HTTP_201_CREATED)
 def create_floor_collection(floor_collection: floor_collection_schema.FloorCollectionCreate,
                             db: Session = Depends(get_db),
-                            user: User = Depends(get_current_user)):
+                            user: User = Depends(get_user_id)):
     if user.is_staff:
         floor_collection_crud.create(db, floor_collection)
     else:

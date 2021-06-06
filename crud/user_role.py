@@ -28,7 +28,8 @@ def get_role_privilege(db: Session, user_id: int):
 def check_user_role_privilege(db: Session, user_db):
     if check_privilege(db, user_db, "user_management"):
         user_role = db.query(models.UserRole).filter_by(id=user_db.user_role_id).first()
-        return get_children(user_role.child[0])
+        if user_role.child:
+            return get_children(user_role.child[0])
 
 
 def get_children(user_role_child):

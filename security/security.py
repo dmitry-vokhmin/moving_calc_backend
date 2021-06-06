@@ -29,7 +29,7 @@ def create_access_token(user, expires_delta=dt.timedelta(ACCESS_TOKEN_EXPIRE_DAY
     return encoded_jwt
 
 
-def get_current_user(token: str = Depends(oauth2_scheme)):
+def get_user_id(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",

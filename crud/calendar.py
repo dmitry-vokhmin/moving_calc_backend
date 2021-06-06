@@ -21,8 +21,6 @@ def read(db: Session, id: int, user_id: int):
 
 
 def create(db: Session, calendar: calendar_schema.CalendarCreate, user_company_id: int):
-    # user_db = get_user(db, user_id)
-    # check_privilege(db, user_db, "configuration")
     calendar_count = db.query(models.Calendar).filter((((models.Calendar.start_date <= calendar.start_date) &
                                                         (models.Calendar.end_date >= calendar.start_date)) |
                                                        ((models.Calendar.start_date <= calendar.end_date) &
@@ -56,35 +54,45 @@ def update(db: Session, calendar: calendar_schema.CalendarCreate, user_id: int):
     try:
         create(db, calendar, user_db.company_id)
     except HTTPException:
-        separate_dates = db.query(models.Calendar).filter(((models.Calendar.start_date < calendar.start_date) &
-                                                           (models.Calendar.end_date > calendar.end_date)) &
-                                                          (models.Calendar.company_id == user_db.company_id)).first()
-        if separate_dates:
-            new_end_date = separate_dates.end_date
-            new_price_tag_id = separate_dates.price_tag_id
-            db.query(models.Calendar).filter_by(id=separate_dates.id).update(
-                {"end_date": calendar.start_date - dt.timedelta(days=1)})
-            new_model = calendar_schema.CalendarCreate(
-                start_date=calendar.start_date + dt.timedelta(days=1),
-                end_date=new_end_date,
-                price_tag_id=new_price_tag_id
-            )
-            create(db, new_model, user_id)
-        middle_dates = db.query(models.Calendar).filter(((models.Calendar.start_date >= calendar.start_date) &
-                                                         (models.Calendar.end_date <= calendar.end_date)) &
-                                                        (models.Calendar.company_id == user_db.company_id)).all()
-        for date in middle_dates:
-            db.query(models.Calendar).filter_by(id=date.id).delete()
-        start_date = db.query(models.Calendar).filter(((models.Calendar.start_date < calendar.start_date) &
-                                                       (models.Calendar.end_date >= calendar.start_date)) &
-                                                      (models.Calendar.company_id == user_db.company_id)).first()
-        if start_date:
-            db.query(models.Calendar).filter_by(id=start_date.id).update(
-                {"end_date": calendar.start_date - dt.timedelta(days=1)})
-        end_date = db.query(models.Calendar).filter(((models.Calendar.start_date <= calendar.end_date) &
-                                                     (models.Calendar.end_date > calendar.end_date)) &
-                                                    (models.Calendar.company_id == user_db.company_id)).first()
-        if end_date:
-            db.query(models.Calendar).filter_by(id=end_date.id).update(
-                {"start_date": calendar.end_date + dt.timedelta(days=1)})
+        separate_dates(db, calendar, user_db, user_id)
+        delete_middle_date(db, calendar, user_db)
+        update_end_date(db, calendar, user_db)
+        update_start_date(db, calendar, user_db)
         create(db, calendar, user_db.company_id)
+
+
+def separate_dates(db, calendar, user_db, user_id):
+    dates = db.query(models.Calendar).filter(((models.Calendar.start_date < calendar.start_date) &
+                                              (models.Calendar.end_date > calendar.end_date)) &
+                                             (models.Calendar.company_id == user_db.company_id)).first()
+    if dates:
+        new_end_date = dates.end_date
+        new_price_tag_id = dates.price_tag_id
+        db.query(models.Calendar).filter_by(id=dates.id).update(
+            {"end_date": calendar.start_date - dt.timedelta(days=1)})
+        new_model = calendar_schema.CalendarCreate(
+            start_date=calendar.start_date + dt.timedelta(days=1),
+            end_date=new_end_date,
+            price_tag_id=new_price_tag_id
+        )
+        create(db, new_model, user_id)
+
+
+def delete_middle_date(db, calendar, user_db):
+    db.query(models.Calendar).filter(((models.Calendar.start_date >= calendar.start_date) &
+                                      (models.Calendar.end_date <= calendar.end_date)) &
+                                     (models.Calendar.company_id == user_db.company_id)).delete()
+
+
+def update_end_date(db, calendar, user_db):
+    db.query(models.Calendar).filter(((models.Calendar.start_date < calendar.start_date) &
+                                      (models.Calendar.end_date >= calendar.start_date)) &
+                                     (models.Calendar.company_id == user_db.company_id)).update(
+        {"end_date": calendar.start_date - dt.timedelta(days=1)})
+
+
+def update_start_date(db, calendar, user_db):
+    db.query(models.Calendar).filter(((models.Calendar.start_date <= calendar.end_date) &
+                                      (models.Calendar.end_date > calendar.end_date)) &
+                                     (models.Calendar.company_id == user_db.company_id)).update(
+        {"start_date": calendar.end_date + dt.timedelta(days=1)})

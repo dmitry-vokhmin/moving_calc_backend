@@ -1,10 +1,10 @@
 from typing import List
-from fastapi import Depends, APIRouter, status, HTTPException
+from fastapi import Depends, APIRouter, status
 from data_base.database import get_db
 from schemas import inventory as inventory_schema
 from crud import inventory as inventory_crud
 from sqlalchemy.orm import Session
-from security.security import get_current_user
+from security.security import get_user_id
 from data_base.models import User
 
 router = APIRouter(tags=["Inventory"])
@@ -13,23 +13,26 @@ router = APIRouter(tags=["Inventory"])
 @router.post("/inventory/", status_code=status.HTTP_201_CREATED)
 def create_inventory(inventory: inventory_schema.InventoryCreate,
                      db: Session = Depends(get_db),
-                     user: User = Depends(get_current_user)):
-    inventory_crud.create(db, inventory, user.id)
+                     user_id: int = Depends(get_user_id)):
+    inventory_crud.create(db, inventory, user_id)
 
 
 @router.get("/inventory/{inventory_id}", response_model=inventory_schema.InventoryGet, status_code=status.HTTP_200_OK)
-def get_inventory(inventory_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    return inventory_crud.read(db, inventory_id, user.id)
+def get_inventory(inventory_id: int, db: Session = Depends(get_db), user: User = Depends(get_user_id)):
+    return inventory_crud.read(db, inventory_id)
 
 
-@router.get("/inventory/all/{room_name}", response_model=List[inventory_schema.InventoryGet],
+@router.get("/inventory/", response_model=List[inventory_schema.InventoryGet],
             status_code=status.HTTP_200_OK)
-def get_all_inventory(room_name: str, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    return inventory_crud.read_all(db, room_name, user.id)
+def get_all_inventory(room_collection_id: int = None,
+                      inventory_collection_id: int = None,
+                      db: Session = Depends(get_db),
+                      user_id: int = Depends(get_user_id)):
+    return inventory_crud.read_all_by_id(db, room_collection_id, inventory_collection_id, user_id)
 
 
 @router.put("/inventory/delete/{inventory_id}", status_code=status.HTTP_200_OK)
-def delete_inventory(inventory_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+def delete_inventory(inventory_id: int, db: Session = Depends(get_db), user: User = Depends(get_user_id)):
     inventory_crud.delete(db, inventory_id, user.id)
 
 
@@ -37,5 +40,5 @@ def delete_inventory(inventory_id: int, db: Session = Depends(get_db), user: Use
 def update_inventory(inventory_id: int,
                      inventory: inventory_schema.InventoryBase,
                      db: Session = Depends(get_db),
-                     user: User = Depends(get_current_user)):
+                     user: User = Depends(get_user_id)):
     inventory_crud.update(db, inventory_id, inventory, user.id)

@@ -1,17 +1,12 @@
-from pydantic import BaseModel, validator
+from pydantic import BaseModel
+from schemas.room import RoomGet
 
 
 class RoomCollectionsBase(BaseModel):
-    name: str
+    room_id: int
 
     class Config:
         orm_mode = True
-
-    @validator("name")
-    def empty_str(cls, v):
-        if v == "":
-            raise ValueError("Empty string")
-        return v
 
 
 class RoomCollectionsCreate(RoomCollectionsBase):
@@ -20,3 +15,4 @@ class RoomCollectionsCreate(RoomCollectionsBase):
 
 class RoomCollectionsGet(RoomCollectionsBase):
     id: int
+    rooms: RoomGet

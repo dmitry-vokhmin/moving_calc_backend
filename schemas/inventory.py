@@ -5,11 +5,10 @@ from pydantic import BaseModel, validator
 class InventoryBase(BaseModel):
     name: str
     height: Optional[float]
-    weight: Optional[float]
     width: Optional[float]
     length: Optional[float]
-    dimension: float
-    unit: Optional[int]
+    inventory_category_id: Optional[int]
+    dimension: Optional[float]
 
     class Config:
         orm_mode = True
@@ -27,4 +26,4 @@ class InventoryCreate(InventoryBase):
 
 class InventoryGet(InventoryBase):
     id: int
-    user_id: int
+    company_id: Optional[int]

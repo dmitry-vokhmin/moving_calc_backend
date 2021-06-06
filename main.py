@@ -19,6 +19,8 @@ from routers import mover_amount
 from routers import company
 from routers import user_role
 from routers import user_privilege
+from routers import room
+from routers import inventory_category
 
 app = FastAPI(title="some_service", description="", version="0.0.1")
 app.include_router(user.router)
@@ -42,6 +44,8 @@ app.include_router(truck_type.router)
 app.include_router(calculate.router)
 app.include_router(user_role.router)
 app.include_router(user_privilege.router)
+app.include_router(room.router)
+app.include_router(inventory_category.router)
 
 if __name__ == '__main__':
     import uvicorn

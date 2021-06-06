@@ -4,7 +4,7 @@ from data_base.database import get_db
 from schemas import services as services_schema
 from crud import services as services_crud
 from sqlalchemy.orm import Session
-from security.security import get_current_user
+from security.security import get_user_id
 from data_base.models import User
 
 router = APIRouter(tags=["Services"])
@@ -13,7 +13,7 @@ router = APIRouter(tags=["Services"])
 @router.post("/service/", status_code=status.HTTP_201_CREATED)
 def create_services(services: services_schema.ServicesCreate,
                     db: Session = Depends(get_db),
-                    user: User = Depends(get_current_user)):
+                    user: User = Depends(get_user_id)):
     if user.is_staff:
         services_crud.create(db, services)
     else:
@@ -35,7 +35,7 @@ def get_all_services(db: Session = Depends(get_db)):
 
 
 @router.put("/service/delete/{service_id}", status_code=status.HTTP_200_OK)
-def delete_service(service_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+def delete_service(service_id: int, db: Session = Depends(get_db), user: User = Depends(get_user_id)):
     if user.is_staff:
         services_crud.delete(db, service_id)
     else:
@@ -50,7 +50,7 @@ def delete_service(service_id: int, db: Session = Depends(get_db), user: User = 
 def update_service(service_id: int,
                    service: services_schema.ServicesBase,
                    db: Session = Depends(get_db),
-                   user: User = Depends(get_current_user)):
+                   user: User = Depends(get_user_id)):
     if user.is_staff:
         services_crud.update(db, service_id, service)
     else:

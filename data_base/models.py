@@ -4,18 +4,15 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from . import mixin
 
-"""
-Объекты для перевозки
-- название
-- высота
-- ширина
-- глубина
-- обьем
-- вес
-- единицы измерения
-"""
 
 Base = declarative_base()
+inventory_category_room = Table(
+    "inventory_category_room",
+    Base.metadata,
+    Column("inventory_category_id", Integer, ForeignKey("inventory_category.id")),
+    Column("room_id", Integer, ForeignKey("room.id"))
+)
+
 inventory_room_collection = Table(
     "inventory_room_collection",
     Base.metadata,
@@ -44,26 +41,31 @@ class Inventory(Base, mixin.IdMixin, mixin.NameMixin):
     height = Column(Float, nullable=True)
     width = Column(Float, nullable=True)
     length = Column(Float, nullable=True)
-    weight = Column(Float, nullable=True)
     dimension = Column(Float, nullable=False)
-    unit = Column(Integer, nullable=True)
     room_collections = relationship("RoomCollection", secondary=inventory_room_collection)
     inventory_collections = relationship("InventoryCollection", secondary=inventory_inventory_collection)
-    company_id = Column(Integer, ForeignKey("company.id"), nullable=False)
+    company_id = Column(Integer, ForeignKey("company.id"), nullable=True)
     companies = relationship("Company")
+    inventory_category_id = Column(Integer, ForeignKey("inventory_category.id"), nullable=True)
+    inventory_category = relationship("InventoryCategory")
 
-    def __init__(self, name, company_id, unit=None, dimension=None, height=None, width=None, length=None, weight=None):
+    def __init__(self, name, company_id, inventory_category_id=None, dimension=None, height=None, width=None, length=None):
         if not dimension:
             if all((height, width, length)):
                 dimension = height * width * length
         self.dimension = dimension
         self.company_id = company_id
         self.name = name
-        self.unit = unit
         self.height = height
-        self.weight = weight
         self.width = width
         self.length = length
+        self.inventory_category_id = inventory_category_id
+
+
+class InventoryCategory(Base, mixin.IdMixin, mixin.NameMixin):
+    __tablename__ = "inventory_category"
+    inventory = relationship("Inventory")
+    room = relationship("Room", secondary=inventory_category_room)
 
 
 class UserClient(Base, mixin.IdMixin):
@@ -103,9 +105,20 @@ class Order(Base, mixin.IdMixin):
     inventory_orders = relationship("InventoryOrder")
 
 
-class RoomCollection(Base, mixin.IdMixin, mixin.NameMixin):
+class RoomCollection(Base, mixin.IdMixin):
     __tablename__ = "room_collection"
+    is_public = Column(Boolean, default=False, nullable=False, index=True)
+    room_id = Column(Integer, ForeignKey("room.id"), nullable=False)
+    rooms = relationship("Room", lazy="joined")
+    company_id = Column(Integer, ForeignKey("company.id"), nullable=True)
+    companies = relationship("Company")
     inventories = relationship("Inventory", secondary=inventory_room_collection)
+
+
+class Room(Base, mixin.IdMixin, mixin.NameMixin):
+    __tablename__ = "room"
+    room_collection = relationship("RoomCollection")
+    inventory_category = relationship("InventoryCategory", secondary=inventory_category_room)
 
 
 class InventoryCollection(Base, mixin.IdMixin):
@@ -114,7 +127,7 @@ class InventoryCollection(Base, mixin.IdMixin):
     move_size_id = Column(Integer, ForeignKey("move_size.id"), nullable=False)
     move_size = relationship("MoveSize", lazy="joined")
     inventories = relationship("Inventory", secondary=inventory_inventory_collection)
-    company_id = Column(Integer, ForeignKey("company.id"), nullable=False)
+    company_id = Column(Integer, ForeignKey("company.id"), nullable=True)
     companies = relationship("Company")
 
 
@@ -182,10 +195,11 @@ class PriceTag(Base, mixin.IdMixin, mixin.NameMixin):
 
 
 class Price(Base, mixin.IdMixin):
-    __tablename__ = "mover_price"
-    price = Column(Integer, nullable=False)
+    __tablename__ = "price"
+    __table_args__ = (UniqueConstraint("mover_amount_id", "price_tag_id", name="_amount_tag"),)
+    price = Column(Float, nullable=False)
     mover_amount_id = Column(Integer, ForeignKey("mover_amount.id"), nullable=False)
-    mover_amount = relationship("MoverAmount", lazy="joined")
+    mover_amount = relationship("MoverAmount")
     price_tag_id = Column(Integer, ForeignKey("price_tag.id"), nullable=False)
     price_tag = relationship("PriceTag")
     company_id = Column(Integer, ForeignKey("company.id"), nullable=False)
