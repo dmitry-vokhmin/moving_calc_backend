@@ -17,6 +17,7 @@ class InventoryCollectionCreate(InventoryCollectionBase):
 
 class InventoryCollectionCreatePersonal(InventoryCollectionBase):
     inventory_id: int
+    count: int
 
 
 class InventoryCollectionGet(InventoryCollectionBase):

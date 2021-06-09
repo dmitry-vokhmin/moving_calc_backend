@@ -29,7 +29,9 @@ def add_to_personal(db: Session,
     user_db = get_user(db, user_id)
     check_privilege(db, user_db, "inventory")
     inventory_collection_db = read(db, inventory_collection.move_size_id, user_db.company_id)
-    inventory_db = read_inventory(db, inventory_collection.inventory_id)
+    inventory_db = models.InventoryInventoryCollection(inventory_id=inventory_collection.inventory_id,
+                                                       inventory_collection_id=inventory_collection_db.id,
+                                                       count=inventory_collection.count)
     inventory_collection_db.inventories.append(inventory_db)
     try:
         db.commit()
@@ -85,7 +87,7 @@ def create_user_collection(db, user_db):
             company_id=user_db.company_id
         )
         user_collection = create(db, create_schema)
-        user_collection.inventories.extend(inventory_collection.inventories)
+        create_new_inventory(user_collection, inventory_collection)
     try:
         db.commit()
     except Exception as e:
@@ -93,13 +95,27 @@ def create_user_collection(db, user_db):
         raise HTTPException(status_code=400, detail=str(e))
 
 
-def delete_inventory(db: Session, inventory_id: int, inventory_collection_id: int, user_id: int):
+def create_new_inventory(user_collection, inventory_collection):
+    for row in inventory_collection.inventories:
+        new_collection = models.InventoryInventoryCollection(
+            inventory_id=row.inventory_id,
+            inventory_collection_id=user_collection.id,
+            count=row.count
+        )
+        user_collection.inventories.append(new_collection)
+
+
+def reset_inventory(db: Session, inventory_collection_id: int, user_id: int):
     user_db = get_user(db, user_id)
     check_privilege(db, user_db, "inventory")
     inventory_collection_db = db.query(models.InventoryCollection).filter_by(id=inventory_collection_id,
                                                                              company_id=user_db.company_id).first()
-    inventory_db = db.query(models.Inventory).filter_by(id=inventory_id).first()
-    inventory_collection_db.inventories.remove(inventory_db)
+    inventory_collection_public = db.query(models.InventoryCollection).filter_by(
+        move_size_id=inventory_collection_db.move_size_id,
+        is_public=True
+    ).first()
+    db.query(models.InventoryInventoryCollection).filter_by(inventory_collection_id=inventory_collection_id).delete()
+    create_new_inventory(inventory_collection_db, inventory_collection_public)
     try:
         db.commit()
     except Exception as e:

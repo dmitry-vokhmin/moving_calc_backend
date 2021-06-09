@@ -4,7 +4,6 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from . import mixin
 
-
 Base = declarative_base()
 inventory_category_room = Table(
     "inventory_category_room",
@@ -18,13 +17,6 @@ inventory_room_collection = Table(
     Base.metadata,
     Column("inventory_id", Integer, ForeignKey("inventory.id")),
     Column("room_collection_id", Integer, ForeignKey("room_collection.id"))
-)
-
-inventory_inventory_collection = Table(
-    "inventory_inventory_collections",
-    Base.metadata,
-    Column("inventory_id", Integer, ForeignKey("inventory.id")),
-    Column("inventory_collection_id", Integer, ForeignKey("inventory_collection.id"))
 )
 
 user_role_user_privilege = Table(
@@ -43,13 +35,14 @@ class Inventory(Base, mixin.IdMixin, mixin.NameMixin):
     length = Column(Float, nullable=True)
     dimension = Column(Float, nullable=False)
     room_collections = relationship("RoomCollection", secondary=inventory_room_collection)
-    inventory_collections = relationship("InventoryCollection", secondary=inventory_inventory_collection)
+    inventory_collections = relationship("InventoryInventoryCollection")
     company_id = Column(Integer, ForeignKey("company.id"), nullable=True)
     companies = relationship("Company")
     inventory_category_id = Column(Integer, ForeignKey("inventory_category.id"), nullable=True)
     inventory_category = relationship("InventoryCategory")
 
-    def __init__(self, name, company_id, inventory_category_id=None, dimension=None, height=None, width=None, length=None):
+    def __init__(self, name, company_id, inventory_category_id=None, dimension=None, height=None, width=None,
+                 length=None):
         if not dimension:
             if all((height, width, length)):
                 dimension = height * width * length
@@ -60,6 +53,15 @@ class Inventory(Base, mixin.IdMixin, mixin.NameMixin):
         self.width = width
         self.length = length
         self.inventory_category_id = inventory_category_id
+
+
+class InventoryInventoryCollection(Base, mixin.IdMixin):
+    __tablename__ = "inventory_inventory_collection"
+    inventory_id = Column(Integer, ForeignKey("inventory.id"), nullable=False)
+    inventory_collection_id = Column(Integer, ForeignKey("inventory_collection.id"), nullable=False)
+    count = Column(Integer, nullable=False)
+    inventories = relationship("Inventory", lazy="joined")
+    inventory_collections = relationship("InventoryCollection")
 
 
 class InventoryCategory(Base, mixin.IdMixin, mixin.NameMixin):
@@ -126,7 +128,7 @@ class InventoryCollection(Base, mixin.IdMixin):
     is_public = Column(Boolean, default=False, nullable=False, index=True)
     move_size_id = Column(Integer, ForeignKey("move_size.id"), nullable=False)
     move_size = relationship("MoveSize", lazy="joined")
-    inventories = relationship("Inventory", secondary=inventory_inventory_collection)
+    inventories = relationship("InventoryInventoryCollection")
     company_id = Column(Integer, ForeignKey("company.id"), nullable=True)
     companies = relationship("Company")
 

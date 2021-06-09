@@ -37,7 +37,7 @@ def read_all_by_id(db: Session, room_collection_id, inventory_collection_id, use
         )
     else:
         inventory_db = db.query(models.Inventory).filter(
-            models.Inventory.inventory_collections.any(id=inventory_collection_id)
+            models.Inventory.inventory_collections.any(inventory_collection_id=inventory_collection_id)
         )
     return inventory_db.all()
     # query = db.query(models.Inventory).filter((models.Inventory.user_id == user_id) |

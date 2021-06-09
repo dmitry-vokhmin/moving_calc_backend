@@ -43,11 +43,10 @@ def get_all_inventory_collection(db: Session = Depends(get_db), user_id: int = D
 
 
 @router.delete("/inventory_collection/", status_code=status.HTTP_200_OK)
-def delete_inventory_collection(inventory_id: int,
-                                inventory_collection_id: int,
-                                db: Session = Depends(get_db),
-                                user_id: int = Depends(get_user_id)):
-    inventory_collection_crud.delete_inventory(db, inventory_id, inventory_collection_id, user_id)
+def reset_inventory_collection(inventory_collection_id: int,
+                               db: Session = Depends(get_db),
+                               user_id: int = Depends(get_user_id)):
+    inventory_collection_crud.reset_inventory(db, inventory_collection_id, user_id)
 
 
 @router.put("/inventory_collection/update/{inventory_collection_id}", status_code=status.HTTP_200_OK)
