@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from routers import inventory, calculate
 from routers import user_client
 from routers import room_collections
@@ -22,6 +23,7 @@ from routers import user_privilege
 from routers import room
 from routers import inventory_category
 from routers import inventory_inventory_collection
+from routers import inventory_order
 
 app = FastAPI(title="some_service", description="", version="0.0.1")
 app.include_router(user.router)
@@ -48,6 +50,9 @@ app.include_router(user_privilege.router)
 app.include_router(room.router)
 app.include_router(inventory_category.router)
 app.include_router(inventory_inventory_collection.router)
+app.include_router(inventory_order.router)
+
+app.mount("/images", StaticFiles(directory="images"), name="images")
 
 if __name__ == '__main__':
     import uvicorn

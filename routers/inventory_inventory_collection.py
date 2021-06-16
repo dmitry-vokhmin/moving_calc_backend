@@ -12,10 +12,11 @@ router = APIRouter(tags=["Inventory Inventory collection"])
 @router.get("/inventory_inventory_collection/",
             response_model=List[inventory_collection_schema.InventoryInventoryCollectionGet],
             status_code=status.HTTP_200_OK)
-def get_inventory_collection(inventory_collection_id: int,
+def get_inventory_collection(inventory_collection_id: int = None,
+                             move_size_id: int = None,
                              db: Session = Depends(get_db),
                              user_id: int = Depends(get_user_id)):
-    return inventory_collection_crud.read_all(db, inventory_collection_id, user_id)
+    return inventory_collection_crud.read_all(db, inventory_collection_id, move_size_id, user_id)
 
 
 @router.put("/inventory_inventory_collection/", status_code=status.HTTP_200_OK)

@@ -21,9 +21,16 @@ class InventoryBase(BaseModel):
 
 
 class InventoryCreate(InventoryBase):
-    pass
+    image: Optional[str]
 
 
 class InventoryGet(InventoryBase):
     id: int
     company_id: Optional[int]
+    image: Optional[str]
+
+    @validator('image', always=True)
+    def urljoin(cls, v) -> str:
+        if v:
+            return f"http://127.0.0.1:8080/{v}"
+        return v

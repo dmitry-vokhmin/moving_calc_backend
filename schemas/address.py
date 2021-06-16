@@ -4,7 +4,7 @@ from .zip_code import ZipCodeGet
 
 
 class AddressBase(BaseModel):
-    street: str
+    street: Optional[str]
     apartment: Optional[str]
 
     class Config:

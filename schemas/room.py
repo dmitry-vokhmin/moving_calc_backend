@@ -15,8 +15,13 @@ class RoomBase(BaseModel):
 
 
 class RoomCreate(RoomBase):
-    pass
+    image: str
 
 
 class RoomGet(RoomBase):
     id: int
+    image: str
+
+    @validator('image', always=True)
+    def urljoin(cls, image) -> str:
+        return f"http://127.0.0.1:8080/{image}"

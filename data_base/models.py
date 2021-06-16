@@ -5,6 +5,13 @@ from sqlalchemy.orm import relationship
 from . import mixin
 
 Base = declarative_base()
+move_size_order = Table(
+    "move_size_order",
+    Base.metadata,
+    Column("move_size_id", Integer, ForeignKey("move_size.id")),
+    Column("order_id", Integer, ForeignKey("order.id"))
+)
+
 inventory_category_room = Table(
     "inventory_category_room",
     Base.metadata,
@@ -30,6 +37,7 @@ user_role_user_privilege = Table(
 class Inventory(Base, mixin.IdMixin, mixin.NameMixin):
     __tablename__ = "inventory"
     is_public = Column(Boolean, default=False, nullable=False, index=True)
+    image = Column(String, nullable=True)
     height = Column(Float, nullable=True)
     width = Column(Float, nullable=True)
     length = Column(Float, nullable=True)
@@ -42,7 +50,7 @@ class Inventory(Base, mixin.IdMixin, mixin.NameMixin):
     inventory_category = relationship("InventoryCategory")
 
     def __init__(self, name, company_id, inventory_category_id=None, dimension=None, height=None, width=None,
-                 length=None):
+                 length=None, image=None):
         if not dimension:
             if all((height, width, length)):
                 dimension = height * width * length
@@ -53,6 +61,7 @@ class Inventory(Base, mixin.IdMixin, mixin.NameMixin):
         self.width = width
         self.length = length
         self.inventory_category_id = inventory_category_id
+        self.image = image
 
 
 class InventoryInventoryCollection(Base, mixin.IdMixin):
@@ -86,8 +95,8 @@ class Order(Base, mixin.IdMixin):
     hourly_rate = Column(Integer, nullable=False)
     estimated_cost = Column(String, nullable=False)
     estimated_hours = Column(String, nullable=False)
-    movers = Column(Integer, nullable=False)
-    truck_type = Column(Integer, nullable=False)
+    crew_size = Column(Integer, nullable=False)
+    truck_size = Column(Integer, nullable=False)
     travel_time = Column(Integer, nullable=False)
     create_date = Column(DateTime, default=dt.datetime.now, nullable=False)
     user_id = Column(Integer, ForeignKey("user_client.id"), nullable=False)
@@ -96,8 +105,6 @@ class Order(Base, mixin.IdMixin):
     address_from = relationship("Address", lazy="joined", foreign_keys=[address_from_id])
     address_to_id = Column(Integer, ForeignKey("address.id"), nullable=False)
     address_to = relationship("Address", lazy="joined", foreign_keys=[address_to_id])
-    move_size_id = Column(Integer, ForeignKey("move_size.id"), nullable=False)
-    move_size = relationship("MoveSize", lazy="joined")
     service_id = Column(Integer, ForeignKey("service.id"), nullable=False)
     service = relationship("Service", lazy="joined")
     floor_collection_from_id = Column(Integer, ForeignKey("floor_collection.id"), nullable=False)
@@ -105,6 +112,7 @@ class Order(Base, mixin.IdMixin):
     floor_collection_to_id = Column(Integer, ForeignKey("floor_collection.id"), nullable=False)
     floor_collection_to = relationship("FloorsCollection", lazy="joined", foreign_keys=[floor_collection_to_id])
     inventory_orders = relationship("InventoryOrder")
+    move_sizes = relationship("MoveSize", secondary=move_size_order)
 
 
 class RoomCollection(Base, mixin.IdMixin):
@@ -119,6 +127,7 @@ class RoomCollection(Base, mixin.IdMixin):
 
 class Room(Base, mixin.IdMixin, mixin.NameMixin):
     __tablename__ = "room"
+    image = Column(String, nullable=False)
     room_collection = relationship("RoomCollection")
     inventory_category = relationship("InventoryCategory", secondary=inventory_category_room)
 
@@ -135,7 +144,9 @@ class InventoryCollection(Base, mixin.IdMixin):
 
 class InventoryOrder(Base, mixin.IdMixin):
     __tablename__ = "inventory_order"
-    amount = Column(Integer, nullable=False)
+    count = Column(Integer, nullable=False)
+    move_size_id = Column(Integer, ForeignKey("move_size.id"), nullable=False)
+    move_size = relationship("MoveSize")
     inventory_id = Column(Integer, ForeignKey("inventory.id"), nullable=False)
     inventories = relationship("Inventory")
     order_id = Column(Integer, ForeignKey("order.id"), nullable=False)
@@ -144,8 +155,9 @@ class InventoryOrder(Base, mixin.IdMixin):
 
 class MoveSize(Base, mixin.IdMixin, mixin.NameMixin):
     __tablename__ = "move_size"
-    order = relationship("Order")
+    is_extra = Column(Boolean, nullable=False)
     inventory_collection = relationship("InventoryCollection")
+    order = relationship("Order", secondary=move_size_order)
 
 
 class Truck(Base, mixin.IdMixin):
@@ -226,7 +238,7 @@ class FloorsCollection(Base, mixin.IdMixin, mixin.NameMixin):
 class Address(Base, mixin.IdMixin):
     __tablename__ = "address"
     __table_args__ = (UniqueConstraint("street", "zip_code_id", name="_address"),)
-    street = Column(String, nullable=False)
+    street = Column(String, nullable=True)
     apartment = Column(String, nullable=True)
     zip_code_id = Column(Integer, ForeignKey("zip_code.id"), nullable=False)
     zip_code = relationship("ZipCode", lazy="joined")

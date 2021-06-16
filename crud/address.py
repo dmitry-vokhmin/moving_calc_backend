@@ -9,13 +9,14 @@ def read(db: Session, id: int):
     return query.first()
 
 
-def create(db: Session, address: address_schema.AddressCreate):
+def get_or_create(db: Session, address: address_schema.AddressCreate):
     address_db = models.Address(**address.dict())
     db.add(address_db)
     try:
         db.commit()
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        db.rollback()
+        address_db = db.query(models.Address).filter_by(**address.dict()).first()
     return address_db
 
 

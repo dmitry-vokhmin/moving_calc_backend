@@ -4,6 +4,7 @@ from data_base.database import get_db
 from schemas import user_client as user_client_schema
 from crud import user_client as user_client_crud
 from sqlalchemy.orm import Session
+from security.security import get_user_id
 
 router = APIRouter(tags=["User Client"])
 

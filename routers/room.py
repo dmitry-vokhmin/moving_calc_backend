@@ -23,5 +23,5 @@ def get_room(room_id: int, db: Session = Depends(get_db), user_id: User = Depend
 
 
 @router.get("/room/", response_model=List[room_schema.RoomGet], status_code=status.HTTP_200_OK)
-def get_all_rooms(db: Session = Depends(get_db), user_id: User = Depends(get_user_id)):
+def get_all_rooms(db: Session = Depends(get_db)):
     return room_crud.read_all(db)

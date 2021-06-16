@@ -10,7 +10,6 @@ def read(db: Session, id: int):
 
 
 def get_or_create(db: Session, user: user_client_schema.UserCreate):
-    # phone_number = db.query(models.PhoneNumber).filter(models.PhoneNumber.phone_number == user.phone_number).first()
     user_db = models.UserClient(**user.dict())
     db.add(user_db)
     try:

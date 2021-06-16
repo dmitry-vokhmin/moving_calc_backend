@@ -10,7 +10,8 @@ def read(db: Session, id: int):
 
 
 def create(db: Session, order: order_schema.OrderCreate):
-    order_db = models.Order(**order.dict())
+    order_db = models.Order(**order.dict(exclude={"move_size_id_list"}))
+    order_db.move_sizes.extend(db.query(models.MoveSize).filter(models.MoveSize.id.in_(order.move_size_id_list)).all())
     db.add(order_db)
     try:
         db.commit()

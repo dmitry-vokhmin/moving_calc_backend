@@ -3,6 +3,7 @@ from pydantic import BaseModel, validator
 
 class MoveSizeBase(BaseModel):
     name: str
+    is_extra: bool
 
     class Config:
         orm_mode = True

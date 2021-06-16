@@ -29,15 +29,29 @@ def add_to_personal(db: Session,
     user_db = get_user(db, user_id)
     check_privilege(db, user_db, "inventory")
     inventory_collection_db = read(db, inventory_collection.move_size_id, user_db.company_id)
-    inventory_db = models.InventoryInventoryCollection(inventory_id=inventory_collection.inventory_id,
-                                                       inventory_collection_id=inventory_collection_db.id,
-                                                       count=inventory_collection.count)
-    inventory_collection_db.inventories.append(inventory_db)
+    update_or_create(db, inventory_collection.inventory_id, inventory_collection_db.id, inventory_collection.count)
     try:
         db.commit()
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=400, detail=str(e))
+
+
+def update_or_create(db: Session, inventory_id, inventory_collection_id, count):
+    inventory_inventory_collection_db = db.query(models.InventoryInventoryCollection).filter_by(
+        inventory_id=inventory_id,
+        inventory_collection_id=inventory_collection_id
+    )
+    if inventory_inventory_collection_db.first():
+        db_count = inventory_inventory_collection_db.first().count
+        inventory_inventory_collection_db.update({"count": db_count + count})
+    else:
+        new_inventory_inventory_collection_db = models.InventoryInventoryCollection(
+            inventory_id=inventory_id,
+            inventory_collection_id=inventory_collection_id,
+            count=count
+        )
+        db.add(new_inventory_inventory_collection_db)
 
 
 # def get_or_create_inventory_collection(db: Session, inventory_collection, company_id):

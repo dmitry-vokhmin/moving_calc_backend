@@ -10,7 +10,7 @@ router = APIRouter(tags=["Address"])
 
 @router.post("/address/", response_model=address_schema.AddressGet, status_code=status.HTTP_201_CREATED)
 def create_address(address: address_schema.AddressCreate, db: Session = Depends(get_db)):
-    return address_crud.create(db, address)
+    return address_crud.get_or_create(db, address)
 
 
 @router.get("/address/{address_id}", response_model=address_schema.AddressGet, status_code=status.HTTP_200_OK)
