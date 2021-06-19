@@ -1,4 +1,5 @@
 from pydantic import BaseModel, validator
+from schemas.address import AddressGet
 
 
 class CompanyBase(BaseModel):
@@ -8,15 +9,20 @@ class CompanyBase(BaseModel):
         orm_mode = True
 
     @validator("name")
-    def empty_str(cls, v):
-        if v == "":
+    def empty_str(cls, name):
+        if name == "":
             raise ValueError("Empty string")
-        return v
+        return name
 
 
 class CompanyCreate(CompanyBase):
-    pass
+    street: str
+    apartment: str
+    zip_code: str
+    city: str
+    state: str
 
 
 class CompanyGet(CompanyBase):
     id: int
+    address: AddressGet

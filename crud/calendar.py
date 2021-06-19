@@ -15,11 +15,6 @@ def check_date_order(calendar):
     return calendar
 
 
-def read(db: Session, id: int, user_id: int):
-    query = db.query(models.Calendar).filter_by(id=id, user_id=user_id)
-    return query.first()
-
-
 def create(db: Session, calendar: calendar_schema.CalendarCreate, user_company_id: int):
     calendar_count = db.query(models.Calendar).filter((((models.Calendar.start_date <= calendar.start_date) &
                                                         (models.Calendar.end_date >= calendar.start_date)) |
@@ -42,8 +37,10 @@ def create(db: Session, calendar: calendar_schema.CalendarCreate, user_company_i
 
 def read_all(db: Session, user_id: int):
     user_db = get_user(db, user_id)
-    check_privilege(db, user_db, "configuration")
-    query = db.query(models.Calendar).filter_by(company_id=user_db.company_id)
+    if user_db.is_staff:
+        query = db.query(models.Calendar)
+    else:
+        query = db.query(models.Calendar).filter_by(company_id=user_db.company_id)
     return query.all()
 
 

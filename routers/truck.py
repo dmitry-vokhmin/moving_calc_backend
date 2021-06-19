@@ -16,11 +16,6 @@ def create_truck(truck: truck_schema.TruckCreate,
     truck_crud.create(db, truck, user_id)
 
 
-@router.get("/truck/{truck_id}", response_model=truck_schema.TruckGet, status_code=status.HTTP_200_OK)
-def get_truck(truck_id: int, db: Session = Depends(get_db), user_id=Depends(get_user_id)):
-    return truck_crud.read(db, truck_id, user_id)
-
-
 @router.get("/truck/", response_model=List[truck_schema.TruckGet], status_code=status.HTTP_200_OK)
 def get_all_trucks(db: Session = Depends(get_db), user_id=Depends(get_user_id)):
     return truck_crud.read_all(db, user_id)

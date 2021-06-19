@@ -30,7 +30,5 @@ class InventoryGet(InventoryBase):
     image: Optional[str]
 
     @validator('image', always=True)
-    def urljoin(cls, v) -> str:
-        if v:
-            return f"http://127.0.0.1:8080/{v}"
-        return v
+    def urljoin(cls, image) -> str:
+        return f"http://127.0.0.1:8080/{image}"

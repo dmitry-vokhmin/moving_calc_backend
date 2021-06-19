@@ -12,18 +12,10 @@ router = APIRouter(tags=["Inventory collection"])
 
 @router.post("/inventory_collection/", status_code=status.HTTP_201_CREATED)
 def create_personal_inventory_collection(
-        inventory_collection: inventory_collection_schema.InventoryCollectionCreatePersonal,
+        inventory_collection: inventory_collection_schema.InventoryCollectionCreate,
         db: Session = Depends(get_db),
         user_id: int = Depends(get_user_id)):
-    inventory_collection_crud.add_to_personal(db, inventory_collection, user_id)
-
-
-@router.post("/inventory_collection/{move_size_id}", status_code=status.HTTP_201_CREATED)
-def update_many_to_many(move_size_id: int,
-                        inventory: List[int],
-                        db: Session = Depends(get_db),
-                        user: User = Depends(get_user_id)):
-    inventory_collection_crud.update_many_to_many_inventory(db, move_size_id, inventory, user.id)
+    inventory_collection_crud.create_public(db, inventory_collection, user_id)
 
 
 @router.get("/inventory_collection/{inventory_collection_id}",
@@ -49,16 +41,10 @@ def reset_inventory_collection(inventory_collection_id: int,
     inventory_collection_crud.reset_inventory(db, inventory_collection_id, user_id)
 
 
-@router.put("/inventory_collection/update/{inventory_collection_id}", status_code=status.HTTP_200_OK)
+@router.put("/inventory_collection/", status_code=status.HTTP_200_OK)
 def update_inventory_collection(inventory_collection_id: int,
                                 inventory_collection: inventory_collection_schema.InventoryCollectionCreate,
                                 db: Session = Depends(get_db),
-                                user: User = Depends(get_user_id)):
-    if user.is_staff:
-        inventory_collection_crud.update(db, inventory_collection_id, inventory_collection)
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+                                user_id: int = Depends(get_user_id)):
+    inventory_collection_crud.update(db, inventory_collection_id, inventory_collection, user_id)
+

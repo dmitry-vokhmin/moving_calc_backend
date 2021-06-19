@@ -13,17 +13,25 @@ router = APIRouter(tags=["Inventory Category"])
 def create_inventory_category(inventory_category: inventory_category_schema.InventoryCategoryCreate,
                               db: Session = Depends(get_db),
                               user_id: int = Depends(get_user_id)):
-    inventory_category_crud.create(db, inventory_category)
-
-
-@router.get("/inventory_category/{inventory_category_id}",
-            response_model=inventory_category_schema.InventoryCategoryGet, status_code=status.HTTP_200_OK)
-def get_inventory_category(inventory_category_id: int, db: Session = Depends(get_db),
-                           user_id: int = Depends(get_user_id)):
-    return inventory_category_crud.read(db, inventory_category_id, user_id)
+    inventory_category_crud.create(db, inventory_category, user_id)
 
 
 @router.get("/inventory_category/",
             response_model=List[inventory_category_schema.InventoryCategoryGet], status_code=status.HTTP_200_OK)
-def get_all_inventory_categories(room_id: int = None, db: Session = Depends(get_db), user_id: int = Depends(get_user_id)):
-    return inventory_category_crud.read_all(db, user_id, room_id)
+def get_all_inventory_categories(room_id: int = None, db: Session = Depends(get_db)):
+    return inventory_category_crud.read_all(db, room_id)
+
+
+@router.delete("/inventory_category/", status_code=status.HTTP_201_CREATED)
+def delete_inventory_category(inventory_category_id: int,
+                              db: Session = Depends(get_db),
+                              user_id: int = Depends(get_user_id)):
+    inventory_category_crud.delete(db, inventory_category_id, user_id)
+
+
+@router.put("/inventory_category/", status_code=status.HTTP_201_CREATED)
+def update_inventory_category(inventory_category_id: int,
+                              inventory_category: inventory_category_schema.InventoryCategoryCreate,
+                              db: Session = Depends(get_db),
+                              user_id: int = Depends(get_user_id)):
+    inventory_category_crud.update(db, inventory_category_id, inventory_category, user_id)

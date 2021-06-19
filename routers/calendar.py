@@ -16,11 +16,6 @@ def create_calendar(calendar: calendar_schema.CalendarCreate,
     return calendar_crud.create(db, calendar, user_id)
 
 
-@router.get("/calendar/{calendar_id}", response_model=calendar_schema.CalendarGet, status_code=status.HTTP_200_OK)
-def get_calendar(calendar_id: int, db: Session = Depends(get_db), user_id=Depends(get_user_id)):
-    return calendar_crud.read(db, calendar_id, user_id)
-
-
 @router.get("/calendar/", response_model=List[calendar_schema.CalendarGet], status_code=status.HTTP_200_OK)
 def get_all_calendar(db: Session = Depends(get_db), user_id=Depends(get_user_id)):
     return calendar_crud.read_all(db, user_id)

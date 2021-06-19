@@ -54,4 +54,3 @@ class UserUpdate(UserCreate):
 class UserGet(UserBase):
     id: int
     user_role: UserRoleGet
-    is_staff: bool

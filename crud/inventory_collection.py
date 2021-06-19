@@ -1,10 +1,8 @@
-from typing import List
 from sqlalchemy.orm import Session
 from data_base import models
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from schemas import inventory_collection as inventory_collection_schema
 from security.security import get_user, check_privilege
-from crud.inventory import read as read_inventory
 
 
 def read(db: Session, move_size_id: int, company_id: int):
@@ -12,8 +10,20 @@ def read(db: Session, move_size_id: int, company_id: int):
     return query.first()
 
 
-def create(db: Session, inventory_collection: inventory_collection_schema.InventoryCollectionCreate):
-    inventory_collection_db = models.InventoryCollection(**inventory_collection.dict())
+def create_public(db: Session, inventory_collection: inventory_collection_schema.InventoryCollectionCreate, user_id):
+    user_db = get_user(db, user_id)
+    if user_db.is_staff:
+        inventory_collection_db = models.InventoryCollection(**inventory_collection.dict(), is_public=True)
+        db.add(inventory_collection_db)
+        try:
+            db.commit()
+        except Exception as e:
+            db.rollback()
+            raise HTTPException(status_code=400, detail=str(e))
+
+
+def create_personal(db: Session, inventory_collection: inventory_collection_schema.InventoryCollectionCreate):
+    inventory_collection_db = models.InventoryCollection(**inventory_collection.dict(), is_public=False)
     db.add(inventory_collection_db)
     try:
         db.commit()
@@ -21,37 +31,6 @@ def create(db: Session, inventory_collection: inventory_collection_schema.Invent
         db.rollback()
         raise HTTPException(status_code=400, detail=str(e))
     return inventory_collection_db
-
-
-def add_to_personal(db: Session,
-                    inventory_collection: inventory_collection_schema.InventoryCollectionCreatePersonal,
-                    user_id: int):
-    user_db = get_user(db, user_id)
-    check_privilege(db, user_db, "inventory")
-    inventory_collection_db = read(db, inventory_collection.move_size_id, user_db.company_id)
-    update_or_create(db, inventory_collection.inventory_id, inventory_collection_db.id, inventory_collection.count)
-    try:
-        db.commit()
-    except Exception as e:
-        db.rollback()
-        raise HTTPException(status_code=400, detail=str(e))
-
-
-def update_or_create(db: Session, inventory_id, inventory_collection_id, count):
-    inventory_inventory_collection_db = db.query(models.InventoryInventoryCollection).filter_by(
-        inventory_id=inventory_id,
-        inventory_collection_id=inventory_collection_id
-    )
-    if inventory_inventory_collection_db.first():
-        db_count = inventory_inventory_collection_db.first().count
-        inventory_inventory_collection_db.update({"count": db_count + count})
-    else:
-        new_inventory_inventory_collection_db = models.InventoryInventoryCollection(
-            inventory_id=inventory_id,
-            inventory_collection_id=inventory_collection_id,
-            count=count
-        )
-        db.add(new_inventory_inventory_collection_db)
 
 
 # def get_or_create_inventory_collection(db: Session, inventory_collection, company_id):
@@ -86,7 +65,6 @@ def update_or_create(db: Session, inventory_id, inventory_collection_id, count):
 
 def read_all(db: Session, user_id: int):
     user_db = get_user(db, user_id)
-    check_privilege(db, user_db, "inventory")
     user_inventory_collection = db.query(models.InventoryCollection).filter_by(company_id=user_db.company_id).all()
     if not user_inventory_collection:
         create_user_collection(db, user_db)
@@ -100,7 +78,7 @@ def create_user_collection(db, user_db):
             move_size_id=inventory_collection.move_size_id,
             company_id=user_db.company_id
         )
-        user_collection = create(db, create_schema)
+        user_collection = create_personal(db, create_schema)
         create_new_inventory(user_collection, inventory_collection)
     try:
         db.commit()
@@ -139,23 +117,31 @@ def reset_inventory(db: Session, inventory_collection_id: int, user_id: int):
 
 def update(db: Session,
            inventory_collection_id: int,
-           inventory_collection: inventory_collection_schema.InventoryCollectionCreate):
-    db.query(models.InventoryCollection).filter_by(id=inventory_collection_id).update(**inventory_collection.dict())
-    try:
-        db.commit()
-    except Exception as e:
-        db.rollback()
-        raise HTTPException(status_code=400, detail=str(e))
+           inventory_collection: inventory_collection_schema.InventoryCollectionCreate,
+           user_id):
+    user_db = get_user(db, user_id)
+    if user_db.is_staff:
+        db.query(models.InventoryCollection).filter_by(id=inventory_collection_id).update(**inventory_collection.dict())
+        try:
+            db.commit()
+        except Exception as e:
+            db.rollback()
+            raise HTTPException(status_code=400, detail=str(e))
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
 
 
-def update_many_to_many_inventory(db: Session, move_size_id: int, inventory: List[int], user_id: int):
-    inventory_collection = db.query(models.InventoryCollection).filter_by(move_size_id=move_size_id,
-                                                                          user_id=user_id).first()
-    inventory_collection.inventories.clear()
-    inventory_collection.inventories.extend(db.query(models.Inventory).filter(models.Inventory.id.in_(
-        inventory)))
-    try:
-        db.commit()
-    except Exception as e:
-        db.rollback()
-        raise HTTPException(status_code=400, detail=str(e))
+# def update_many_to_many_inventory(db: Session, move_size_id: int, inventory: List[int], user_id: int):
+#     inventory_collection = db.query(models.InventoryCollection).filter_by(move_size_id=move_size_id,
+#                                                                           user_id=user_id).first()
+#     inventory_collection.inventories.clear()
+#     inventory_collection.inventories.extend(db.query(models.Inventory).filter(models.Inventory.id.in_(
+#         inventory)))
+#     try:
+#         db.commit()
+#     except Exception as e:
+#         db.rollback()
+#         raise HTTPException(status_code=400, detail=str(e))

@@ -14,14 +14,24 @@ router = APIRouter(tags=["Room"])
 def create_room(room: room_schema.RoomCreate,
                 db: Session = Depends(get_db),
                 user_id: User = Depends(get_user_id)):
-    room_crud.create(db, room)
-
-
-@router.get("/room/{room_id}", response_model=room_schema.RoomGet, status_code=status.HTTP_200_OK)
-def get_room(room_id: int, db: Session = Depends(get_db), user_id: User = Depends(get_user_id)):
-    return room_crud.read(db, room_id, user_id)
+    room_crud.create(db, room, user_id)
 
 
 @router.get("/room/", response_model=List[room_schema.RoomGet], status_code=status.HTTP_200_OK)
 def get_all_rooms(db: Session = Depends(get_db)):
     return room_crud.read_all(db)
+
+
+@router.delete("/room/", status_code=status.HTTP_201_CREATED)
+def delete_room(room_id: int,
+                db: Session = Depends(get_db),
+                user_id: User = Depends(get_user_id)):
+    room_crud.delete(db, room_id, user_id)
+
+
+@router.put("/room/", status_code=status.HTTP_201_CREATED)
+def update_room(room_id: int,
+                room: room_schema.RoomCreate,
+                db: Session = Depends(get_db),
+                user_id: User = Depends(get_user_id)):
+    room_crud.update(db, room_id, room, user_id)

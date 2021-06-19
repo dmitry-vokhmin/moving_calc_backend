@@ -16,13 +16,6 @@ def create_truck_type(truck_type: truck_type_schema.TruckTypeCreate,
     truck_type_crud.create(db, truck_type, user_id)
 
 
-@router.get("/truck_type/{truck_type_id}",
-            response_model=truck_type_schema.TruckTypeGet,
-            status_code=status.HTTP_200_OK)
-def get_truck_type(truck_type_id: int, db: Session = Depends(get_db), user_id=Depends(get_user_id)):
-    return truck_type_crud.read(db, truck_type_id, user_id)
-
-
 @router.get("/truck_type/", response_model=List[truck_type_schema.TruckTypeGet], status_code=status.HTTP_200_OK)
 def get_all_truck_types(user_id=Depends(get_user_id), db: Session = Depends(get_db)):
     return truck_type_crud.read_all(db, user_id)
@@ -30,8 +23,8 @@ def get_all_truck_types(user_id=Depends(get_user_id), db: Session = Depends(get_
 
 @router.delete("/truck_type/", status_code=status.HTTP_200_OK)
 def delete_truck_type(truck_type: truck_type_schema.TruckTypeGet,
-                      db: Session = Depends(get_db)
-                      , user_id=Depends(get_user_id)):
+                      db: Session = Depends(get_db),
+                      user_id=Depends(get_user_id)):
     truck_type_crud.delete(db, truck_type, user_id)
 
 

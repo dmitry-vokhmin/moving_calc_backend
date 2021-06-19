@@ -30,9 +30,9 @@ def read_user(db: Session = Depends(get_db), user_id=Depends(get_user_id)):
     return user_crud.read(db, user_id)
 
 
-@router.get("/user/{user_id}", response_model=user_schema.UserGet, status_code=status.HTTP_200_OK)
-def read_user(user_id: int, db: Session = Depends(get_db), main_user_id=Depends(get_user_id)):
-    return user_crud.read(db, main_user_id, user_id)
+# @router.get("/user/{user_id}", response_model=user_schema.UserGet, status_code=status.HTTP_200_OK)
+# def read_user(user_id: int, db: Session = Depends(get_db), main_user_id=Depends(get_user_id)):
+#     return user_crud.read(db, main_user_id, user_id)
 
 
 @router.put("/user/", response_model=user_schema.UserGet, status_code=status.HTTP_200_OK)

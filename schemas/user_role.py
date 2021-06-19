@@ -7,10 +7,10 @@ class UserRoleBase(BaseModel):
     parent_id: Union[int, None]
 
     @validator("role")
-    def empty_str(cls, v):
-        if v == "":
+    def empty_str(cls, role):
+        if role == "":
             raise ValueError("Empty string")
-        return v
+        return role
 
     class Config:
         orm_mode = True

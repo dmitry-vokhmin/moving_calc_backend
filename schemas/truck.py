@@ -26,4 +26,3 @@ class TruckUpdate(TruckCreate):
 class TruckGet(TruckBase):
     id: int
     truck_type: TruckTypeGet
-    company_id: int

@@ -8,10 +8,10 @@ class RoomBase(BaseModel):
         orm_mode = True
 
     @validator("name")
-    def empty_str(cls, v):
-        if v == "":
+    def empty_str(cls, name):
+        if name == "":
             raise ValueError("Empty string")
-        return v
+        return name
 
 
 class RoomCreate(RoomBase):

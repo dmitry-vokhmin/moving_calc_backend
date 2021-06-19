@@ -49,11 +49,12 @@ class Inventory(Base, mixin.IdMixin, mixin.NameMixin):
     inventory_category_id = Column(Integer, ForeignKey("inventory_category.id"), nullable=True)
     inventory_category = relationship("InventoryCategory")
 
-    def __init__(self, name, company_id, inventory_category_id=None, dimension=None, height=None, width=None,
+    def __init__(self, is_public, name, company_id, inventory_category_id=None, dimension=None, height=None, width=None,
                  length=None, image=None):
         if not dimension:
             if all((height, width, length)):
                 dimension = height * width * length
+        self.is_public = is_public
         self.dimension = dimension
         self.company_id = company_id
         self.name = name
@@ -242,6 +243,7 @@ class Address(Base, mixin.IdMixin):
     apartment = Column(String, nullable=True)
     zip_code_id = Column(Integer, ForeignKey("zip_code.id"), nullable=False)
     zip_code = relationship("ZipCode", lazy="joined")
+    company = relationship("Company")
 
 
 class ZipCode(Base, mixin.IdMixin):
@@ -258,9 +260,9 @@ class User(Base, mixin.IdMixin):
     password = Column(String, nullable=False)
     email = Column(String, nullable=False, unique=True)
     is_staff = Column(Boolean, nullable=False, default=False)
-    company_id = Column(Integer, ForeignKey("company.id"))
+    company_id = Column(Integer, ForeignKey("company.id"), nullable=False)
     company = relationship("Company")
-    user_role_id = Column(Integer, ForeignKey("user_role.id"))
+    user_role_id = Column(Integer, ForeignKey("user_role.id"), nullable=True)
     user_role = relationship("UserRole", lazy="joined")
 
 
@@ -281,6 +283,9 @@ class UserPrivilege(Base, mixin.IdMixin):
 
 class Company(Base, mixin.IdMixin, mixin.NameMixin):
     __tablename__ = "company"
+    is_active = Column(Boolean, default=False, nullable=False)
+    address_id = Column(Integer, ForeignKey("address.id"), nullable=False)
+    address = relationship("Address", lazy="joined")
     users = relationship("User")
     trucks = relationship("Truck")
     truck_types = relationship("TruckType")

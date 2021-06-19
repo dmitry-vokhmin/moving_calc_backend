@@ -15,11 +15,6 @@ class InventoryCollectionCreate(InventoryCollectionBase):
     pass
 
 
-class InventoryCollectionCreatePersonal(InventoryCollectionBase):
-    inventory_id: int
-    count: int
-
-
 class InventoryCollectionGet(InventoryCollectionBase):
     id: int
     move_size: MoveSizeGet

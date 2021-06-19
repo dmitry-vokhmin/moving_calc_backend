@@ -23,4 +23,3 @@ class TruckTypeUpdate(TruckTypeBase):
 
 class TruckTypeGet(TruckTypeBase):
     id: int
-    company_id: int

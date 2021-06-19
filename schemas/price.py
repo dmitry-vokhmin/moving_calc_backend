@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import List
 from pydantic import BaseModel
 
 
@@ -16,9 +16,8 @@ class MoverPriceCreate(MoverPriceBase):
 
 
 class MoverPriceUpdate(BaseModel):
-    __root__: Tuple[MoverPriceCreate]
+    __root__: List[MoverPriceCreate]
 
 
 class MoverPriceGet(MoverPriceBase):
     id: int
-    company_id: int

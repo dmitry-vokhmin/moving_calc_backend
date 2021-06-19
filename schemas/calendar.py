@@ -19,4 +19,3 @@ class CalendarCreate(CalendarBase):
 class CalendarGet(CalendarBase):
     id: int
     price_tag: PriceTagGet
-    company_id: int
