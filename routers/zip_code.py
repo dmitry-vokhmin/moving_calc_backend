@@ -13,15 +13,8 @@ router = APIRouter(tags=["Zip code"])
 @router.post("/zip_code/", status_code=status.HTTP_201_CREATED)
 def create_zip_code(zip_code: zip_code_schema.ZipCodeCreate,
                     db: Session = Depends(get_db),
-                    user: User = Depends(get_user_id)):
-    if user.is_staff:
-        zip_code_crud.create(db, zip_code)
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+                    user_id=Depends(get_user_id)):
+    zip_code_crud.create(db, zip_code, user_id)
 
 
 @router.get("/zip_code/", response_model=zip_code_schema.ZipCodeGet, status_code=status.HTTP_200_OK)
@@ -30,5 +23,5 @@ def get_zip_code(zip_code: str = None, db: Session = Depends(get_db)):
 
 
 @router.get("/zip_code/", response_model=List[zip_code_schema.ZipCodeGet], status_code=status.HTTP_200_OK)
-def get_all_zip_code(db: Session = Depends(get_db)):
-    return zip_code_crud.read_all(db)
+def get_all_zip_code(db: Session = Depends(get_db), user_id=Depends(get_user_id)):
+    return zip_code_crud.read_all(db, user_id)

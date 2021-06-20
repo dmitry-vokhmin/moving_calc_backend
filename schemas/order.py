@@ -5,7 +5,6 @@ from .user_client import UserGet
 from .address import AddressGet
 from .floor_collection import FloorCollectionGet
 from .services import ServicesGet
-from .move_size import MoveSizeGet
 
 
 class OrderBase(BaseModel):
@@ -16,7 +15,6 @@ class OrderBase(BaseModel):
     travel_time: int
     crew_size: int
     truck_size: int
-
 
     class Config:
         orm_mode = True

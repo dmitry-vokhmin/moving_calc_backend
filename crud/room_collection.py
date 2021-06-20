@@ -62,8 +62,9 @@ def delete_inventory(db: Session, inventory_id: int, user_id: int):
     user_db = get_user(db, user_id)
     check_privilege(db, user_db, "inventory")
     room_collection_db = read_personal(db, user_db.company_id)
-    inventory_db = db.query(models.Inventory).filter_by(id=inventory_id).first()
-    room_collection_db.inventories.remove(inventory_db)
+    inventory_db = db.query(models.Inventory).filter_by(id=inventory_id)
+    room_collection_db.inventories.remove(inventory_db.first())
+    inventory_db.delete()
     try:
         db.commit()
     except Exception as e:

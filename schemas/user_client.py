@@ -19,23 +19,23 @@ class UserBase(BaseModel):
     phone_number: constr(max_length=50, strip_whitespace=True)
 
     @validator('phone_number')
-    def check_phone_number(cls, v):
+    def check_phone_number(cls, phone_number):
         try:
-            n = parse_phone_number(v, "US")
+            parse_number = parse_phone_number(phone_number, "US")
         except NumberParseException as e:
             raise ValueError('Please provide a valid mobile phone number') from e
 
-        if not is_valid_number(n) or number_type(n) not in MOBILE_NUMBER_TYPES:
+        if not is_valid_number(parse_number) or number_type(parse_number) not in MOBILE_NUMBER_TYPES:
             raise ValueError('Please provide a valid mobile phone number')
 
-        return format_number(n, PhoneNumberFormat.E164)
+        return format_number(parse_number, PhoneNumberFormat.E164)
         # PhoneNumberFormat.NATIONAL if n.country_code == 1 else PhoneNumberFormat.INTERNATIONAL
 
     @validator("firstname", "lastname")
-    def empty_str(cls, v):
-        if v == "":
+    def empty_str(cls, value):
+        if value == "":
             raise ValueError("Empty string")
-        return v
+        return value
 
     class Config:
         orm_mode = True

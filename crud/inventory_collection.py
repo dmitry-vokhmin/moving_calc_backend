@@ -33,36 +33,6 @@ def create_personal(db: Session, inventory_collection: inventory_collection_sche
     return inventory_collection_db
 
 
-# def get_or_create_inventory_collection(db: Session, inventory_collection, company_id):
-#     inventory_collection_db = db.query(models.InventoryCollection).filter_by(
-#         move_size_id=inventory_collection.move_size_id, company_id=company_id
-#     ).first()
-#     if not inventory_collection_db:
-#         inventory_collection = inventory_collection_schema.InventoryCollectionCreate(
-#             move_size_id=inventory_collection.move_size_id,
-#             company_id=company_id
-#         )
-#         inventory_collection_db = create(db, inventory_collection)
-#         inventory_collection_id = db.query(models.InventoryCollection).filter_by(
-#             move_size_id=inventory_collection.move_size_id, is_public=True).first()
-#         inventory_collection_db.inventories.extend(db.query(models.Inventory).filter(
-#             models.Inventory.inventory_collections.any(id=inventory_collection_id.id)).all())
-#     return inventory_collection_db
-
-
-# def read_all(db: Session, user_id: int):
-#     user_db = get_user(db, user_id)
-#     check_privilege(db, user_db, "inventory")
-#     user_inventory = db.query(models.InventoryCollection).filter_by(company_id=user_db.company_id).all()
-#     if user_inventory:
-#         query = db.query(models.InventoryCollection).filter(models.InventoryCollection.move_size_id.notin_(
-#             [inventory.move_size_id for inventory in user_inventory]
-#         )).all()
-#         query.extend(user_inventory)
-#     else:
-#         query = db.query(models.InventoryCollection).all()
-#     return query
-
 def read_all(db: Session, user_id: int):
     user_db = get_user(db, user_id)
     user_inventory_collection = db.query(models.InventoryCollection).filter_by(company_id=user_db.company_id).all()
@@ -132,16 +102,3 @@ def update(db: Session,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-
-
-# def update_many_to_many_inventory(db: Session, move_size_id: int, inventory: List[int], user_id: int):
-#     inventory_collection = db.query(models.InventoryCollection).filter_by(move_size_id=move_size_id,
-#                                                                           user_id=user_id).first()
-#     inventory_collection.inventories.clear()
-#     inventory_collection.inventories.extend(db.query(models.Inventory).filter(models.Inventory.id.in_(
-#         inventory)))
-#     try:
-#         db.commit()
-#     except Exception as e:
-#         db.rollback()
-#         raise HTTPException(status_code=400, detail=str(e))

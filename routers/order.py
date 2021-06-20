@@ -4,6 +4,7 @@ from data_base.database import get_db
 from schemas import order as order_schema
 from crud import order as order_crud
 from sqlalchemy.orm import Session
+from security.security import get_user_id
 
 router = APIRouter(tags=["Order"])
 
@@ -14,10 +15,10 @@ def create_order(order: order_schema.OrderCreate, db: Session = Depends(get_db))
 
 
 @router.get("/order/{order_id}", response_model=order_schema.OrderGet, status_code=status.HTTP_200_OK)
-def get_order(order_id: int, db: Session = Depends(get_db)):
-    return order_crud.read(db, order_id)
+def get_order(order_id: int, db: Session = Depends(get_db), user_id=Depends(get_user_id)):
+    return order_crud.read(db, order_id, user_id)
 
 
 @router.get("/order/", response_model=List[order_schema.OrderGet], status_code=status.HTTP_200_OK)
-def get_all_orders(db: Session = Depends(get_db)):
-    return order_crud.read_all(db)
+def get_all_orders(db: Session = Depends(get_db), user_id=Depends(get_user_id)):
+    return order_crud.read_all(db, user_id)

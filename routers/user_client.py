@@ -15,10 +15,10 @@ def create_user(user: user_client_schema.UserCreate, db: Session = Depends(get_d
 
 
 @router.get("/user_client/{user_client_id}", response_model=user_client_schema.UserGet, status_code=status.HTTP_200_OK)
-def get_user(user_client_id: int, db: Session = Depends(get_db)):
-    return user_client_crud.read(db, user_client_id)
+def get_user(user_client_id: int, db: Session = Depends(get_db), user_id=Depends(get_user_id)):
+    return user_client_crud.read(db, user_client_id, user_id)
 
 
 @router.get("/user_client/", response_model=List[user_client_schema.UserGet], status_code=status.HTTP_200_OK)
-def get_all_users(db: Session = Depends(get_db)):
-    return user_client_crud.read_all(db)
+def get_all_users(db: Session = Depends(get_db), user_id=Depends(get_user_id)):
+    return user_client_crud.read_all(db, user_id)

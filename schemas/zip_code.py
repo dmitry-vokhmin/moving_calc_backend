@@ -10,10 +10,10 @@ class ZipCodeBase(BaseModel):
         orm_mode = True
 
     @validator("zip_code", "city", "state")
-    def empty_str(cls, v):
-        if v == "":
+    def empty_str(cls, value):
+        if value == "":
             raise ValueError("Empty string")
-        return v
+        return value
 
 
 class ZipCodeCreate(ZipCodeBase):
