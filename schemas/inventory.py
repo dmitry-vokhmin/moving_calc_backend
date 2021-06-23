@@ -1,5 +1,6 @@
 from typing import Optional
 from pydantic import BaseModel, validator
+from config import DOMAIN
 
 
 class InventoryBase(BaseModel):
@@ -31,4 +32,4 @@ class InventoryGet(InventoryBase):
 
     @validator('image', always=True)
     def urljoin(cls, image) -> str:
-        return f"http://127.0.0.1:8080/{image}"
+        return f"{DOMAIN}{image}"

@@ -18,3 +18,10 @@ def post_company(company: company_schema.CompanyCreate,
 @router.get("/company/", response_model=List[company_schema.CompanyGet], status_code=status.HTTP_200_OK)
 def read_all_companies(db: Session = Depends(get_db), user_id=Depends(get_user_id)):
     return company_crud.read_all(db, user_id)
+
+
+@router.put("/company/", status_code=status.HTTP_200_OK)
+def update_company(company: company_schema.CompanyCreate,
+                   db: Session = Depends(get_db),
+                   user_id=Depends(get_user_id)):
+    company_crud.update(db, company, user_id)

@@ -15,11 +15,12 @@ def create(db: Session, price_tag: price_tag_schema.PriceTagCreate, user_id: int
         except Exception as e:
             db.rollback()
             raise HTTPException(status_code=400, detail=str(e))
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 
 def read_all(db: Session):
@@ -36,11 +37,12 @@ def delete(db: Session, price_tag_id: int, user_id: int):
         except Exception as e:
             db.rollback()
             raise HTTPException(status_code=400, detail=str(e))
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 
 def update(db: Session, price_tag_id: int, price_tag: price_tag_schema.PriceTagCreate, user_id: int):
@@ -52,8 +54,9 @@ def update(db: Session, price_tag_id: int, price_tag: price_tag_schema.PriceTagC
         except Exception as e:
             db.rollback()
             raise HTTPException(status_code=400, detail=str(e))
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )

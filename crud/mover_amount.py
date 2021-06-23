@@ -15,11 +15,12 @@ def create(db: Session, mover_amount: mover_amount_schema.MoverAmountCreate, use
         except Exception as e:
             db.rollback()
             raise HTTPException(status_code=400, detail=str(e))
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 
 def read_all(db: Session):
@@ -36,11 +37,12 @@ def delete(db: Session, mover_amount_id: int, user_id):
         except HTTPException as e:
             db.rollback()
             raise HTTPException(status_code=400, detail=str(e))
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 
 def update(db: Session, mover_amount_id: int, mover_amount: mover_amount_schema.MoverAmountBase, user_id):
@@ -52,8 +54,9 @@ def update(db: Session, mover_amount_id: int, mover_amount: mover_amount_schema.
         except Exception as e:
             db.rollback()
             raise HTTPException(status_code=400, detail=str(e))
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )

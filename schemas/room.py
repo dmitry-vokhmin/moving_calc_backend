@@ -1,4 +1,5 @@
 from pydantic import BaseModel, validator
+from config import DOMAIN
 
 
 class RoomBase(BaseModel):
@@ -18,10 +19,15 @@ class RoomCreate(RoomBase):
     image: str
 
 
+class RoomCategoryCreate(BaseModel):
+    room_id: int
+    category_id: int
+
+
 class RoomGet(RoomBase):
     id: int
     image: str
 
     @validator('image', always=True)
     def urljoin(cls, image) -> str:
-        return f"http://127.0.0.1:8080/{image}"
+        return f"{DOMAIN}{image}"

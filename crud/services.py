@@ -14,11 +14,12 @@ def create(db: Session, services: services_schema.ServicesCreate, user_id):
             db.commit()
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 
 def read_all(db: Session):
@@ -35,11 +36,12 @@ def delete(db: Session, service_id: int, user_id):
         except Exception as e:
             db.rollback()
             raise HTTPException(status_code=400, detail=str(e))
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 
 def update(db: Session, service_id: int, service: services_schema.ServicesBase, user_id):
@@ -51,8 +53,9 @@ def update(db: Session, service_id: int, service: services_schema.ServicesBase, 
         except Exception as e:
             db.rollback()
             raise HTTPException(status_code=400, detail=str(e))
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )

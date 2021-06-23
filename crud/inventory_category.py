@@ -14,11 +14,12 @@ def create(db: Session, inventory_category: inventory_category_schema.InventoryC
             db.commit()
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 
 def read_all(db: Session, room_id: int):
@@ -40,11 +41,12 @@ def delete(db: Session, inventory_category_id, user_id):
         except Exception as e:
             db.rollback()
             raise HTTPException(status_code=400, detail=str(e))
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 
 def update(db: Session, inventory_category_id, inventory_category, user_id):
@@ -58,8 +60,9 @@ def update(db: Session, inventory_category_id, inventory_category, user_id):
         except Exception as e:
             db.rollback()
             raise HTTPException(status_code=400, detail=str(e))
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )

@@ -13,6 +13,11 @@ class RoomCollectionsCreate(RoomCollectionsBase):
     pass
 
 
+class RoomCollectionsInventoryCreate(BaseModel):
+    inventory_name: str
+    room_collection_id: int
+
+
 class RoomCollectionsGet(RoomCollectionsBase):
     id: int
     rooms: RoomGet

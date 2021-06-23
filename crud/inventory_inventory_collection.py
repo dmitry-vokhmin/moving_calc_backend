@@ -60,7 +60,6 @@ def update_or_create(db: Session, inventory_id, inventory_collection_id, count):
 
 def read_all(db: Session, inventory_collection_id: int, move_size_id: int, user_id: int):
     user_db = get_user(db, user_id)
-    check_privilege(db, user_db, "inventory")
     if move_size_id:
         inventory_collection_db = db.query(models.InventoryCollection).filter_by(move_size_id=move_size_id,
                                                                                  company_id=user_db.company_id).first()

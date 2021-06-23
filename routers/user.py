@@ -20,6 +20,16 @@ def add_new_user(user: user_schema.UserCreate, db: Session = Depends(get_db), us
     user_crud.add_new_user(db, user, user_id)
 
 
+@router.get("/user/reset_pass/", status_code=status.HTTP_200_OK)
+def get_one_time_pass(email: str = None, password: str = None, db: Session = Depends(get_db)):
+    user_crud.one_time_pass(db, email, password)
+
+
+@router.put("/user/reset_pass/", status_code=status.HTTP_200_OK)
+def reset_password(user_data: user_schema.ResetPassword, db: Session = Depends(get_db)):
+    user_crud.reset_password(db, user_data)
+
+
 @router.get("/user/company/", response_model=List[user_schema.UserGet], status_code=status.HTTP_200_OK)
 def get_all_company_users(db: Session = Depends(get_db), user_id=Depends(get_user_id)):
     return user_crud.company_user(db, user_id)
@@ -28,11 +38,6 @@ def get_all_company_users(db: Session = Depends(get_db), user_id=Depends(get_use
 @router.get("/user/", response_model=user_schema.UserGet, status_code=status.HTTP_200_OK)
 def read_user(db: Session = Depends(get_db), user_id=Depends(get_user_id)):
     return user_crud.read(db, user_id)
-
-
-# @router.get("/user/{user_id}", response_model=user_schema.UserGet, status_code=status.HTTP_200_OK)
-# def read_user(user_id: int, db: Session = Depends(get_db), main_user_id=Depends(get_user_id)):
-#     return user_crud.read(db, main_user_id, user_id)
 
 
 @router.put("/user/", response_model=user_schema.UserGet, status_code=status.HTTP_200_OK)

@@ -26,21 +26,21 @@ def create(db: Session, inventory: inventory_schema.InventoryCreate, user_id: in
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=400, detail=str(e))
+    return inventory_db
 
 
-def read_all_by_id(db: Session, room_collection_id, inventory_collection_id, user_id: int):
-    user_db = get_user(db, user_id)
-    if user_db.is_staff:
-        inventory_db = db.query(models.Inventory)
+def read_all_by_id(db: Session, room_collection_id, category_id):
+    if category_id and room_collection_id:
+        inventory_db = db.query(models.Inventory).filter(
+            (models.Inventory.room_collections.any(id=room_collection_id)) &
+            (models.Inventory.inventory_category_id == category_id)
+        )
+    elif room_collection_id:
+        inventory_db = db.query(models.Inventory).filter(
+            models.Inventory.room_collections.any(id=room_collection_id)
+        )
     else:
-        if room_collection_id:
-            inventory_db = db.query(models.Inventory).filter(
-                models.Inventory.room_collections.any(id=room_collection_id)
-            )
-        else:
-            inventory_db = db.query(models.Inventory).filter(
-                models.Inventory.inventory_collections.any(inventory_collection_id=inventory_collection_id)
-            )
+        inventory_db = db.query(models.Inventory)
     return inventory_db.all()
 
 
@@ -53,11 +53,12 @@ def delete(db: Session, inventory_id: int, user_id: int):
         except Exception as e:
             db.rollback()
             raise HTTPException(status_code=400, detail=str(e))
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 
 def update(db: Session, inventory_id: int, inventory: inventory_schema.InventoryBase, user_id: int):
@@ -69,8 +70,9 @@ def update(db: Session, inventory_id: int, inventory: inventory_schema.Inventory
         except Exception as e:
             db.rollback()
             raise HTTPException(status_code=400, detail=str(e))
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )

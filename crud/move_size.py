@@ -8,17 +8,18 @@ from security.security import get_user
 def create(db: Session, move_size: move_size_schema.MoveSizeCreate, user_id):
     user_db = get_user(db, user_id)
     if user_db.is_staff:
-        move_size_db = models.MoveSize(name=move_size.name)
+        move_size_db = models.MoveSize(**move_size.dict())
         db.add(move_size_db)
         try:
             db.commit()
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 
 def read_all(db: Session):
@@ -35,11 +36,12 @@ def delete(db: Session, move_size_id: int, user_id):
         except Exception as e:
             db.rollback()
             raise HTTPException(status_code=400, detail=str(e))
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 
 def update(db: Session, move_size_id: int, move_size: move_size_schema.MoveSizeCreate, user_id):
@@ -51,8 +53,9 @@ def update(db: Session, move_size_id: int, move_size: move_size_schema.MoveSizeC
         except Exception as e:
             db.rollback()
             raise HTTPException(status_code=400, detail=str(e))
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )

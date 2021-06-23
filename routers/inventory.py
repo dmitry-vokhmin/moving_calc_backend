@@ -9,20 +9,19 @@ from security.security import get_user_id
 router = APIRouter(tags=["Inventory"])
 
 
-@router.post("/inventory/", status_code=status.HTTP_201_CREATED)
+@router.post("/inventory/", response_model=inventory_schema.InventoryGet, status_code=status.HTTP_201_CREATED)
 def create_inventory(inventory: inventory_schema.InventoryCreate,
                      db: Session = Depends(get_db),
                      user_id: int = Depends(get_user_id)):
-    inventory_crud.create(db, inventory, user_id)
+    return inventory_crud.create(db, inventory, user_id)
 
 
 @router.get("/inventory/", response_model=List[inventory_schema.InventoryGet],
             status_code=status.HTTP_200_OK)
 def get_all_inventory(room_collection_id: int = None,
-                      inventory_collection_id: int = None,
-                      db: Session = Depends(get_db),
-                      user_id: int = Depends(get_user_id)):
-    return inventory_crud.read_all_by_id(db, room_collection_id, inventory_collection_id, user_id)
+                      category_id: int = None,
+                      db: Session = Depends(get_db)):
+    return inventory_crud.read_all_by_id(db, room_collection_id, category_id)
 
 
 @router.delete("/inventory/", status_code=status.HTTP_200_OK)

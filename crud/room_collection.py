@@ -22,11 +22,36 @@ def create(db: Session, room_collection: room_collection_schema.RoomCollectionsC
         except Exception as e:
             db.rollback()
             raise HTTPException(status_code=400, detail=str(e.orig))
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+
+def create_room_collection_inventory(db: Session,
+                                     room_collection_inventory: room_collection_schema.RoomCollectionsInventoryCreate,
+                                     user_id):
+    user_db = get_user(db, user_id)
+    if user_db.is_staff:
+        room_collection_db = db.query(models.RoomCollection).filter_by(
+            id=room_collection_inventory.room_collection_id
+        ).first()
+        room_collection_db.inventories.append(
+            db.query(models.Inventory).filter_by(name=room_collection_inventory.inventory_name).first()
+        )
+        try:
+            db.commit()
+        except Exception as e:
+            db.rollback()
+            raise HTTPException(status_code=400, detail=str(e.orig))
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 
 def create_personal(db: Session, room_id, company_id):
@@ -41,7 +66,6 @@ def create_personal(db: Session, room_id, company_id):
 
 def read_all(db: Session, user_id):
     user_db = get_user(db, user_id)
-    check_privilege(db, user_db, "inventory")
     custom_room = get_or_create_room_collection(db, user_db.company_id)
     if not custom_room:
         custom_room = read_personal(db, user_db.company_id)
@@ -53,7 +77,7 @@ def read_all(db: Session, user_id):
 def get_or_create_room_collection(db, company_id):
     room_collection_db = read_personal(db, company_id)
     if not room_collection_db:
-        room_db = read_room(db, "custom_room")
+        room_db = read_room(db, "Custom Room")
         create_personal(db, room_db.id, company_id)
     return room_collection_db
 
@@ -83,8 +107,9 @@ def update_many_to_many_inventory(db: Session, room_collection_id: int, inventor
         except Exception as e:
             db.rollback()
             raise HTTPException(status_code=400, detail=str(e))
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )

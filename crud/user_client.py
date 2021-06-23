@@ -10,11 +10,12 @@ def read(db: Session, id: int, user_id):
     if user_db.is_staff:
         query = db.query(models.UserClient).filter(models.UserClient.id == id)
         return query.first()
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 
 def get_or_create(db: Session, user: user_client_schema.UserCreate):
@@ -33,8 +34,9 @@ def read_all(db: Session, user_id):
     if user_db.is_staff:
         query = db.query(models.UserClient)
         return query.all()
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )

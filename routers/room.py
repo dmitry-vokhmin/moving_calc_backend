@@ -10,11 +10,18 @@ from data_base.models import User
 router = APIRouter(tags=["Room"])
 
 
-@router.post("/room/", status_code=status.HTTP_201_CREATED)
+@router.post("/room/", response_model=room_schema.RoomGet, status_code=status.HTTP_201_CREATED)
 def create_room(room: room_schema.RoomCreate,
                 db: Session = Depends(get_db),
                 user_id: User = Depends(get_user_id)):
-    room_crud.create(db, room, user_id)
+    return room_crud.create(db, room, user_id)
+
+
+@router.post("/room/category/", status_code=status.HTTP_201_CREATED)
+def create_room_category(room_category: room_schema.RoomCategoryCreate,
+                         db: Session = Depends(get_db),
+                         user_id: User = Depends(get_user_id)):
+    room_crud.create_room_category(db, room_category, user_id)
 
 
 @router.get("/room/", response_model=List[room_schema.RoomGet], status_code=status.HTTP_200_OK)

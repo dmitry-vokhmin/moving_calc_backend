@@ -2,6 +2,7 @@ import re
 from typing import Optional
 from pydantic import BaseModel, EmailStr, SecretStr, validator
 from schemas.user_role import UserRoleGet
+from schemas.company import CompanyGet
 
 
 class UserBase(BaseModel):
@@ -51,6 +52,13 @@ class UserUpdate(UserCreate):
     id: int
 
 
+class ResetPassword(BaseModel):
+    email: str
+    one_time_password: SecretStr
+    password: SecretStr
+
+
 class UserGet(UserBase):
     id: int
-    user_role: UserRoleGet
+    user_role: Optional[UserRoleGet]
+    company: CompanyGet

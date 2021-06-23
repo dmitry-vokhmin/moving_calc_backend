@@ -49,8 +49,8 @@ class Inventory(Base, mixin.IdMixin, mixin.NameMixin):
     inventory_category_id = Column(Integer, ForeignKey("inventory_category.id"), nullable=True)
     inventory_category = relationship("InventoryCategory")
 
-    def __init__(self, is_public, name, company_id, inventory_category_id=None, dimension=None, height=None, width=None,
-                 length=None, image=None):
+    def __init__(self, name, is_public, company_id=None, inventory_category_id=None, dimension=None, height=None,
+                 width=None, length=None, image=None):
         if not dimension:
             if all((height, width, length)):
                 dimension = height * width * length
@@ -258,10 +258,11 @@ class User(Base, mixin.IdMixin):
     __tablename__ = "user"
     fullname = Column(String, nullable=False)
     password = Column(String, nullable=False)
+    one_time_password = Column(String, nullable=True)
     email = Column(String, nullable=False, unique=True)
     is_staff = Column(Boolean, nullable=False, default=False)
     company_id = Column(Integer, ForeignKey("company.id"), nullable=False)
-    company = relationship("Company")
+    company = relationship("Company", lazy="joined")
     user_role_id = Column(Integer, ForeignKey("user_role.id"), nullable=True)
     user_role = relationship("UserRole", lazy="joined")
 

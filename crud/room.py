@@ -19,11 +19,31 @@ def create(db: Session, room: room_schema.RoomCreate, user_id):
             db.commit()
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
+        return room_db
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+
+
+def create_room_category(db: Session, room_category: room_schema.RoomCategoryCreate, user_id):
+    user_db = get_user(db, user_id)
+    if user_db.is_staff:
+        room_db = db.query(models.Room).filter_by(id=room_category.room_id).first()
+        room_db.inventory_category.append(
+            db.query(models.InventoryCategory).filter_by(id=room_category.category_id).first()
+        )
+        try:
+            db.commit()
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=str(e))
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 
 def read_all(db: Session):
@@ -40,11 +60,12 @@ def delete(db: Session, room_id, user_id):
         except Exception as e:
             db.rollback()
             raise HTTPException(status_code=400, detail=str(e))
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 
 def update(db: Session, room_id, room, user_id):
@@ -58,8 +79,9 @@ def update(db: Session, room_id, room, user_id):
         except Exception as e:
             db.rollback()
             raise HTTPException(status_code=400, detail=str(e))
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )

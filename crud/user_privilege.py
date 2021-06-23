@@ -15,11 +15,12 @@ def create(db: Session, user_privilege: user_privilege_schema.UserPrivilegeCreat
         except Exception as e:
             db.rollback()
             raise HTTPException(status_code=400, detail=str(e.orig))
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 
 def read_user_privileges(db: Session, user_id):

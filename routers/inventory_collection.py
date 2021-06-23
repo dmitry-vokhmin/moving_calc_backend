@@ -1,11 +1,10 @@
 from typing import List
-from fastapi import Depends, APIRouter, status, HTTPException
+from fastapi import Depends, APIRouter, status
 from sqlalchemy.orm import Session
 from data_base.database import get_db
 from schemas import inventory_collection as inventory_collection_schema
 from crud import inventory_collection as inventory_collection_crud
 from security.security import get_user_id
-from data_base.models import User
 
 router = APIRouter(tags=["Inventory collection"])
 

@@ -15,11 +15,12 @@ def create(db: Session, user_role: user_role_schema.UserRoleCreate, user_id):
         except Exception as e:
             db.rollback()
             raise HTTPException(status_code=400, detail=str(e.orig))
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 
 def get_role_privilege(db: Session, user_id: int):
@@ -27,14 +28,14 @@ def get_role_privilege(db: Session, user_id: int):
     if user_db.is_staff:
         user_role_db = db.query(models.UserRole).all()
         return user_role_db
-    return check_user_role_privilege(db, user_db)
+    return get_user_role_children(db, user_db)
 
 
-def check_user_role_privilege(db: Session, user_db):
-    if check_privilege(db, user_db, "user_management"):
-        user_role = db.query(models.UserRole).filter_by(id=user_db.user_role_id).first()
-        if user_role.child:
-            return get_children(user_role.child[0])
+def get_user_role_children(db: Session, user_db):
+    user_role = db.query(models.UserRole).filter_by(id=user_db.user_role_id).first()
+    if user_role.child:
+        return get_children(user_role.child[0])
+    return []
 
 
 def get_children(user_role_child):
