@@ -20,14 +20,14 @@ def read_all(db: Session, user_id):
     if user_db.is_staff:
         query = db.query(models.Price)
     else:
-        check_privilege(db, user_db, "configuration")
+        check_privilege(db, user_db, "configurations")
         query = db.query(models.Price).filter_by(company_id=user_db.company_id)
     return query.all()
 
 
 def create_or_update(db: Session, mover_prices: mover_price_schema.MoverPriceUpdate, user_id):
     user_db = get_user(db, user_id)
-    check_privilege(db, user_db, "configuration")
+    check_privilege(db, user_db, "configurations")
     for mover_price in mover_prices.__root__:
         try:
             create(db, mover_price, user_db.company_id)

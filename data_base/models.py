@@ -128,7 +128,6 @@ class RoomCollection(Base, mixin.IdMixin):
 
 class Room(Base, mixin.IdMixin, mixin.NameMixin):
     __tablename__ = "room"
-    image = Column(String, nullable=False)
     room_collection = relationship("RoomCollection")
     inventory_category = relationship("InventoryCategory", secondary=inventory_category_room)
 
