@@ -8,7 +8,7 @@ from schemas.company import CompanyGet
 class UserBase(BaseModel):
     fullname: str
     email: EmailStr
-    company_id: Optional[int]
+    company_id: int
     user_role_id: Optional[int]
 
     @validator("fullname")

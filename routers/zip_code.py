@@ -1,11 +1,10 @@
 from typing import List
-from fastapi import Depends, APIRouter, status, HTTPException
+from fastapi import Depends, APIRouter, status
 from data_base.database import get_db
 from schemas import zip_code as zip_code_schema
 from crud import zip_code as zip_code_crud
 from sqlalchemy.orm import Session
 from security.security import get_user_id
-from data_base.models import User
 
 router = APIRouter(tags=["Zip code"])
 

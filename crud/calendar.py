@@ -47,7 +47,7 @@ def read_all(db: Session, user_id: int):
 def update(db: Session, calendar: calendar_schema.CalendarCreate, user_id: int):
     calendar = check_date_order(calendar)
     user_db = get_user(db, user_id)
-    check_privilege(db, user_db, "configuration")
+    check_privilege(db, user_db, "configurations")
     try:
         create(db, calendar, user_db.company_id)
     except HTTPException:
