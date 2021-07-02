@@ -24,5 +24,5 @@ def get_all_calendar(db: Session = Depends(get_db), user_id=Depends(get_user_id)
 @router.put("/calendar/", status_code=status.HTTP_200_OK)
 def update_calendar(calendar: calendar_schema.CalendarCreate,
                     db: Session = Depends(get_db),
-                    user_id=1):
+                    user_id=Depends(get_user_id)):
     calendar_crud.update(db, calendar, user_id)
