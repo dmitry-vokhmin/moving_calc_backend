@@ -53,3 +53,8 @@ app.include_router(inventory_inventory_collection.router)
 app.include_router(inventory_order.router)
 
 app.mount("/images", StaticFiles(directory="images"), name="images")
+
+if __name__ == '__main__':
+    import uvicorn
+
+    uvicorn.run(app, host="127.0.0.1", port=8080)
