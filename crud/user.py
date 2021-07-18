@@ -100,7 +100,7 @@ def user_update(db: Session, user: user_schema.UserUpdate, user_id: int):
     if (role_children and (user.user_role_id in {role.id for role in role_children}
                            and user_db.company_id == staff_db.company_id)) \
             or (user.id == user_db.id and user.user_role_id == user_db.user_role_id):
-        if valid_password(user, user_db):
+        if valid_password(user, staff_db):
             user.password = get_secret_hash(user.password.get_secret_value())
         db.query(models.User).filter_by(id=user.id).update({**user.dict(exclude={"old_password", "company_id"},
                                                                         exclude_unset=True)})
