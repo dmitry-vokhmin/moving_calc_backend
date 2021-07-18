@@ -25,16 +25,3 @@ def create(db: Session, zip_code: zip_code_schema.ZipCodeCreate, user_id):
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
-
-
-def read_all(db: Session, user_id):
-    user_db = get_user(db, user_id)
-    if user_db.is_staff:
-        query = db.query(models.ZipCode)
-        return query.all()
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )

@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from fastapi import HTTPException, status
+from fastapi import HTTPException
 from data_base import models
 from schemas import company as company_schema
 from security.security import get_user
@@ -45,15 +45,3 @@ def get_zip_code(db: Session, zip_code):
     if zip_code_db:
         return zip_code_db.id
     raise HTTPException(status_code=400, detail=str("Zip code does not exist"))
-
-
-def read_all(db: Session, user_id):
-    user_db = get_user(db, user_id)
-    if user_db.is_staff:
-        query = db.query(models.Company)
-        return query.all()
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )

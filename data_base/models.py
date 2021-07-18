@@ -269,7 +269,7 @@ class User(Base, mixin.IdMixin):
 class UserRole(Base, mixin.IdMixin):
     __tablename__ = "user_role"
     role = Column(String, nullable=False, unique=True)
-    parent_id = Column(Integer, ForeignKey("user_role.id"))
+    parent_id = Column(Integer, ForeignKey("user_role.id"), nullable=True)
     parent = relationship("UserRole", backref="child", remote_side="UserRole.id")
     user = relationship("User")
     user_privilege = relationship("UserPrivilege", secondary=user_role_user_privilege)

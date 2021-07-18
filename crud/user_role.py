@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from data_base import models
 from fastapi import HTTPException, status
 from schemas import user_role as user_role_schema
-from security.security import get_user, check_privilege
+from security.security import get_user
 
 
 def create(db: Session, user_role: user_role_schema.UserRoleCreate, user_id):

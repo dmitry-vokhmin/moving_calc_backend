@@ -52,7 +52,7 @@ app.include_router(inventory_category.router)
 app.include_router(inventory_inventory_collection.router)
 app.include_router(inventory_order.router)
 
-app.mount("/images", StaticFiles(directory="images"), name="images")
+# app.mount("/images", StaticFiles(directory="images"), name="images")
 
 if __name__ == '__main__':
     import uvicorn

@@ -1,4 +1,3 @@
-from typing import List
 from fastapi import Depends, APIRouter, status
 from sqlalchemy.orm import Session
 from data_base.database import get_db
@@ -13,11 +12,6 @@ router = APIRouter(tags=["Company"])
 def post_company(company: company_schema.CompanyCreate,
                  db: Session = Depends(get_db)):
     return company_crud.create(db, company)
-
-
-@router.get("/company/", response_model=List[company_schema.CompanyGet], status_code=status.HTTP_200_OK)
-def read_all_companies(db: Session = Depends(get_db), user_id=Depends(get_user_id)):
-    return company_crud.read_all(db, user_id)
 
 
 @router.put("/company/", status_code=status.HTTP_200_OK)

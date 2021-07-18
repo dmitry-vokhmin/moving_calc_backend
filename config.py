@@ -1,7 +1,9 @@
 import os
 import dotenv
+from pathlib import Path
 
-dotenv.load_dotenv(".env")
+env_path = Path(__file__).parent.joinpath(".env")
+dotenv.load_dotenv(env_path)
 
 DATA_BASE_URL = os.getenv("DATABASE_URL")
 DOMAIN = "https://moving-calculator.herokuapp.com/"

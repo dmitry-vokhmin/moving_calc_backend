@@ -25,5 +25,4 @@ class CompanyCreate(CompanyBase):
 
 class CompanyGet(CompanyBase):
     id: int
-    is_active: bool
     address: AddressGet

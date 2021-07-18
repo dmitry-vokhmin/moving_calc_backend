@@ -1,4 +1,3 @@
-from typing import List
 from fastapi import Depends, APIRouter, status
 from data_base.database import get_db
 from schemas import address as address_schema
@@ -13,11 +12,6 @@ def create_address(address: address_schema.AddressCreate, db: Session = Depends(
     return address_crud.get_or_create(db, address)
 
 
-@router.get("/address/{address_id}", response_model=address_schema.AddressGet, status_code=status.HTTP_200_OK)
+@router.get("/address/", response_model=address_schema.AddressGet, status_code=status.HTTP_200_OK)
 def get_address(address_id: int, db: Session = Depends(get_db)):
     return address_crud.read(db, address_id)
-
-
-@router.get("/address/", response_model=List[address_schema.AddressGet], status_code=status.HTTP_200_OK)
-def get_all_addresses(db: Session = Depends(get_db)):
-    return address_crud.read_all(db)
